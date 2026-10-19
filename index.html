@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Misk City · Mishraq Project MEP Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBEE; --sheet:#F7F9FA; --card:#FCFDFE;
+  --ink:#16283C; --ink2:#4E6178; --ink3:#7C8DA1;
+  --line:#C9D3DC; --line2:#AEBCC8;
+  --blue:#0E5AA7; --blue-soft:#E3EDF7;
+  --done:#1B8A5A; --done-soft:#DFEFE7;
+  --half:#C77F0A; --half-soft:#F6ECD6;
+  --bad:#C43D2E;  --bad-soft:#F6E3E0;
+  --na:#AEB9C4;
+  --navy:#132537; --navy2:#1C344C;
+  --misk1:#3B1A57; --misk2:#63288F; --misk-line:#5E3D80; --misk-th:#46216A;
+  --misk-txt:#F3EDFA; --misk-soft:#D6BCEE; --misk-dim:#C7B3DF;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  font-size:14px; line-height:1.45;
+  padding:18px clamp(10px,2.4vw,28px) 40px;
+  overflow-x:clip;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* ── Masthead / drawing title block ─────────────────────────── */
+.mast{max-width:1460px;margin:0 auto;border-radius:4px 4px 0 0;overflow:hidden;box-shadow:0 2px 14px rgba(22,40,60,.10)}
+.mast-inner{background:linear-gradient(135deg,var(--misk1) 0%,var(--misk2) 100%);color:var(--misk-txt);display:flex;flex-wrap:wrap;gap:20px 34px;align-items:flex-end;padding:22px 26px 20px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.24em;color:var(--misk-soft);margin-bottom:6px}
+.mast h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(30px,4vw,44px);line-height:1.02;letter-spacing:.015em;text-transform:uppercase}
+.mast h1 span{font-weight:500;color:#CDB2EC}
+.mast-sub{font-size:12.5px;color:var(--misk-dim);margin-top:7px;letter-spacing:.02em}
+.tb{border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:10.5px;margin-left:auto;color:#D8C9EA}
+.tb th,.tb td{border:1px solid var(--misk-line);padding:4px 9px;text-align:left}
+.tb th{color:var(--misk-soft);font-weight:500;letter-spacing:.08em;background:var(--misk-th)}
+.tb td{font-weight:600;color:var(--misk-txt)}
+.tb .td-disc{color:#fff;letter-spacing:.06em;background:var(--misk-th)}
+.tb .td-prog{white-space:nowrap}
+.tb-row{cursor:pointer}
+.tb-row:hover .td-disc,.tb-row:hover td{background:rgba(255,255,255,.08)}
+.tb-row:focus-visible td{outline:2px solid var(--misk-soft);outline-offset:-2px}
+.tb-row.active .td-disc{background:#fff;color:var(--misk1)}
+.tb .pbar{display:none}
+.tb .ptxt{display:inline-block;min-width:44px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:2px;color:#fff}
+.ptxt.g0{background:#8A2A20}
+.ptxt.g25{background:#9C6A1B}
+.ptxt.g50{background:#7E7313}
+.ptxt.g75{background:#2E7D4F}
+.ptxt.g100{background:#1B8A5A}
+.ptxt.na{background:transparent;color:var(--misk-soft);font-weight:500}
+.hazard{height:7px;background:repeating-linear-gradient(-45deg,#D9B94A 0 11px,var(--misk1) 11px 22px)}
+
+/* ── Sheet frame ────────────────────────────────────────────── */
+.frame{max-width:1460px;margin:0 auto;background:var(--sheet);border:1px solid var(--line2);border-top:none;border-radius:0 0 4px 4px;box-shadow:0 3px 18px rgba(22,40,60,.08)}
+.sheet{border:1px solid var(--line);margin:10px;border-radius:2px}
+
+/* ── KPI strip ──────────────────────────────────────────────── */
+.kpis{display:grid;grid-template-columns:auto 1fr auto;gap:26px;align-items:center;padding:20px 22px;border-bottom:1px solid var(--line)}
+.kpi-dial{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:158px}
+.dial-wrap{position:relative;width:132px;height:132px}
+.dial-wrap svg{transform:rotate(-90deg)}
+.dial-track{fill:none;stroke:var(--line);stroke-width:9}
+.dial-fill{fill:none;stroke:var(--blue);stroke-width:9;stroke-linecap:butt;transition:stroke-dashoffset 1s cubic-bezier(.22,.9,.35,1)}
+.dial-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;color:var(--ink)}
+.kpi-dial-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--ink2)}
+.kpi-meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px 26px}
+.meter .m-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.meter .m-name{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:var(--ink2)}
+.meter .m-count{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600}
+.meter .m-count em{font-style:normal;color:var(--half);font-weight:500}
+.m-bar{height:8px;background:var(--line);border-radius:2px;margin-top:5px;overflow:hidden;display:flex}
+.m-done{background:var(--done);height:100%;transition:width 1s cubic-bezier(.22,.9,.35,1)}
+.m-half{background:var(--half);height:100%;transition:width 1s cubic-bezier(.22,.9,.35,1)}
+.kpi-side{display:grid;grid-template-columns:repeat(2,auto);gap:8px 22px;border-left:1px solid var(--line);padding-left:24px}
+.ks{min-width:86px}
+.ks b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:600;line-height:1}
+.ks span{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;color:var(--ink2)}
+.ks b.alert{color:var(--bad)}
+
+/* ── Toolbar ────────────────────────────────────────────────── */
+.toolbar{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 22px;background:var(--sheet);border-bottom:1px solid var(--line2)}
+.q{flex:1 1 240px;min-width:200px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;padding:8px 12px;border:1px solid var(--line2);border-radius:3px;background:#fff;color:var(--ink)}
+.q::placeholder{color:var(--ink3)}
+.seg{display:flex;border:1px solid var(--line2);border-radius:3px;overflow:hidden}
+.seg button{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;padding:8px 13px;color:var(--ink2);border-right:1px solid var(--line2)}
+.seg button:last-child{border-right:none}
+.seg button.active{background:var(--navy);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.03em;padding:6px 10px;border:1px solid var(--line2);border-radius:999px;color:var(--ink2);background:#fff;white-space:nowrap}
+.chip i{font-style:normal;font-weight:600;margin-left:5px;color:var(--blue)}
+.chip:hover{border-color:var(--blue)}
+.chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.chip.active i{color:#BBD6F0}
+.chip.warn i{color:var(--bad)}
+.chip.active.warn i{color:#F4C7C2}
+select{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:8px 10px;border:1px solid var(--line2);border-radius:3px;background:#fff;color:var(--ink2)}
+.edit-tools{display:flex;gap:6px;margin-left:auto;align-items:center}
+.tbtn{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.05em;padding:8px 12px;border:1px solid var(--line2);border-radius:3px;background:#fff;color:var(--ink2)}
+.tbtn:hover{border-color:var(--blue);color:var(--blue)}
+.tbtn.info{cursor:default;background:var(--half-soft);border-color:var(--half);color:var(--half)}
+.tbtn.info .n{font-weight:600}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);background:var(--navy);color:#EAF1F8;font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:10px 16px;border-radius:3px;box-shadow:0 6px 18px rgba(22,40,60,.25);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:90;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.umodal,.lmodal{position:fixed;inset:0;background:rgba(19,37,55,.45);z-index:95;display:flex;align-items:center;justify-content:center;padding:18px}
+.umodal[hidden],.lmodal[hidden]{display:none!important}
+.um-choices{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 4px}.uchoice{min-width:110px}.um-who{font-weight:700;margin:10px 0 6px}#uPin{width:100%;padding:10px;border:1px solid rgba(255,255,255,.25);border-radius:8px;background:rgba(255,255,255,.06);color:#fff;font-size:16px;text-align:center;letter-spacing:8px;margin-top:6px}.um-err{color:#ff8a80;font-size:12px;margin-top:8px}
+.tbtn.info{cursor:pointer}
+.um-card{background:var(--card);border:1px solid var(--line2);border-radius:4px;box-shadow:0 10px 34px rgba(22,40,60,.25);padding:22px;max-width:420px;width:100%;direction:rtl;text-align:right;font-family:'IBM Plex Sans',sans-serif}
+.um-card b{display:block;font-size:17px;margin-bottom:6px;color:var(--ink)}
+.um-card p{font-size:12.5px;color:var(--ink2);margin-bottom:12px;line-height:1.6}
+.um-card input{width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--line2);border-radius:3px;margin-bottom:12px}
+.um-acts{display:flex;justify-content:flex-start;gap:8px}
+.loglist{max-height:46vh;overflow-y:auto;border:1px solid var(--line);border-radius:3px;margin-bottom:12px;background:var(--sheet)}
+.logrow{display:flex;gap:8px;align-items:baseline;padding:7px 10px;border-bottom:1px solid var(--line);font-size:11.5px}
+.logrow:last-child{border-bottom:none}
+.logrow .lt{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink3);flex:none;direction:ltr}
+.logrow .lu{font-weight:600;color:var(--blue);flex:none}
+.logrow .lx{color:var(--ink);word-wrap:anywhere}
+body.edited .card{animation:none}
+
+/* ── Cards grid ─────────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;padding:20px 22px}
+.card{position:relative;text-align:left;background:var(--card);border:1px solid var(--line2);border-radius:3px;padding:14px 16px 13px;display:flex;flex-direction:column;gap:10px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;animation:rise .5s both}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(22,40,60,.12);border-color:var(--blue)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.06em;color:var(--blue);border-left:3px solid var(--blue);padding-left:8px}
+.lvls{display:flex;gap:4px}
+.lvls i{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.05em;color:var(--ink2);border:1px solid var(--line2);border-radius:2px;padding:2px 5px;background:var(--sheet)}
+.card-mid{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-mid h3{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:23px;line-height:1.04;letter-spacing:.02em;text-transform:uppercase}
+.card-mid .sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink3);margin-top:3px}
+.mini-dial{position:relative;width:64px;height:64px;flex:none}
+.mini-dial svg{transform:rotate(-90deg)}
+.mini-track{fill:none;stroke:var(--line);stroke-width:5.5}
+.mini-fill{fill:none;stroke:var(--blue);stroke-width:5.5;transition:stroke-dashoffset 1s cubic-bezier(.22,.9,.35,1)}
+.mini-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px}
+.bus{display:flex;gap:3px}
+.seg-cell{flex:1;cursor:pointer;border-radius:2px}
+.seg-cell:hover{box-shadow:0 0 0 2px var(--blue)}
+.seg-cell.na{cursor:not-allowed}
+.seg-cell.na:hover{box-shadow:none}
+.seg-fill{height:9px;border-radius:1.5px;background:var(--line);overflow:hidden;position:relative}
+.seg-fill .f{display:block;height:100%;transition:width 1s cubic-bezier(.22,.9,.35,1)}
+.seg-cell.na .seg-fill{background:repeating-linear-gradient(-45deg,#D8DFE5 0 4px,#E9EEF2 4px 8px)}
+.seg-cell.zero .seg-fill{background:var(--bad-soft)}
+.bus-labels{display:flex;gap:3px}
+.bus-labels span{flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.08em;color:var(--ink3)}
+.card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:9px}
+.eqc{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink2)}
+.eqc b{color:var(--ink)}
+.foot-note{font-size:11px;font-weight:500;color:var(--bad);display:flex;align-items:center;gap:5px;text-align:right}
+.foot-note::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--bad);flex:none}
+.foot-note.ok{color:var(--done)}
+.foot-note.ok::before{background:var(--done)}
+.foot-note.warn{color:var(--half)}
+.foot-note.warn::before{background:var(--half)}
+.empty{grid-column:1/-1;text-align:center;padding:46px 10px;color:var(--ink2)}
+.empty b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:22px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);margin-bottom:6px}
+
+/* ── 2-Week Lookahead ───────────────────────────────────────── */
+.lookahead{border-top:1px solid var(--line2);padding:20px 22px 24px;background:var(--sheet)}
+.lookahead h2{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:20px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.lookahead .la-sub{font-size:12px;color:var(--ink2);margin-bottom:14px}
+.la-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.la-col{border:1px solid var(--line2);border-radius:3px;background:var(--card);display:flex;flex-direction:column}
+.la-head{display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px;border-bottom:1px solid var(--line)}
+.la-head b{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.la-head span{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink3)}
+.la-head .cnt{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:var(--blue)}
+.la-body{padding:10px 12px;display:flex;flex-direction:column;gap:7px;min-height:60px}
+.la-item{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border:1px solid var(--line);border-radius:3px;background:var(--sheet);animation:rise .4s both}
+.la-item:hover{border-color:var(--blue)}
+.la-item.done{opacity:.55}
+.la-item.done .la-txt{text-decoration:line-through}
+.la-check{flex:none;width:18px;height:18px;margin-top:1px;border:1.5px solid var(--line2);border-radius:50%;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;color:#fff}
+.la-check:hover{border-color:var(--done)}
+.la-item.done .la-check{background:var(--done);border-color:var(--done)}
+.la-check:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.la-mid{flex:1;min-width:0}
+.la-txt{font-size:12.5px;line-height:1.4;color:var(--ink);word-wrap:break-word}
+.la-meta{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:var(--ink3);margin-top:3px}
+.la-meta i{font-style:normal;font-weight:600;color:var(--blue)}
+.la-acts{display:flex;gap:4px;flex:none}
+.la-btn{width:24px;height:24px;border:1px solid var(--line2);border-radius:3px;background:#fff;color:var(--ink2);font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center}
+.la-btn:hover{border-color:var(--blue);color:var(--blue)}
+.la-btn:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.la-empty{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink3);text-align:center;padding:14px 6px}
+.la-add{display:flex;gap:6px;flex-wrap:wrap;padding:12px;border-top:1px dashed var(--line2)}
+.la-add input[type=text]{flex:1 1 220px;min-width:160px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;padding:7px 10px;border:1px solid var(--line2);border-radius:3px;background:#fff;color:var(--ink)}
+.la-add select{font-size:10.5px;padding:7px 8px}
+.la-add .tbtn{padding:7px 14px}
+.la-hint{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.04em;color:var(--ink3);padding:0 12px 12px}
+@media (max-width:820px){.la-grid{grid-template-columns:1fr}}
+
+/* ── Legend footer ──────────────────────────────────────────── */
+.foot{border-top:1px solid var(--line2);padding:16px 22px 20px;display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;background:var(--sheet)}
+.leg{display:flex;gap:14px;flex-wrap:wrap}
+.leg span{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--ink2)}
+.leg .sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.src{font-size:11px;color:var(--ink3);margin-left:auto;max-width:560px}
+
+/* ── Empty state (mechanical pre-data) ── */
+.empty-mech{grid-column:1/-1;border:1px dashed var(--line2);border-radius:3px;background:var(--card);padding:40px 20px;text-align:center}
+.empty-mech b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.empty-mech span{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:var(--ink3)}
+.tbtn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ── Discipline placeholders ── */
+.ph{padding:70px 26px 80px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ph-ico{width:54px;height:54px;border:1px dashed var(--line2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink3);margin-bottom:6px}
+.ph h2{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.ph>p{color:var(--ink2);font-size:13.5px;max-width:480px}
+.ph-steps{margin-top:16px;border:1px solid var(--line2);border-radius:3px;background:var(--card);padding:18px 22px;text-align:left;max-width:540px}
+.ph-steps b{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--ink2)}
+.ph-steps ol{margin:10px 0 0 18px;font-size:12.5px;color:var(--ink);display:flex;flex-direction:column;gap:6px}
+.ph .tbtn{margin-top:16px}
+
+/* ── Drawer ─────────────────────────────────────────────────── */
+.backdrop{position:fixed;inset:0;background:rgba(19,37,55,.42);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:60}
+.backdrop.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100dvh;width:min(620px,100vw);background:var(--sheet);border-left:1px solid var(--line2);box-shadow:-8px 0 30px rgba(22,40,60,.18);transform:translateX(102%);transition:transform .28s cubic-bezier(.3,.8,.3,1);z-index:70;display:flex;flex-direction:column}
+.drawer.show{transform:none}
+.dr-head{background:var(--navy);color:#EAF1F8;padding:18px 22px 16px;display:flex;align-items:flex-start;gap:14px}
+.dr-head .tag{color:#8FB9E4;border-color:#8FB9E4;margin-top:3px}
+.dr-head h2{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:27px;text-transform:uppercase;letter-spacing:.02em;line-height:1.05}
+.dr-head .dr-sheet{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8FA6BC;margin-top:4px}
+.dr-close{margin-left:auto;flex:none;width:32px;height:32px;border:1px solid #3D5C7C;border-radius:3px;color:#C6D6E6;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}
+.dr-close:hover{background:#1E3A55}
+.dr-body{overflow-y:auto;padding:18px 22px 30px;flex:1}
+.dr-meters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px;margin-bottom:18px}
+.dr-table{width:100%;border-collapse:collapse}
+.dr-table th{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:var(--ink3);font-weight:500;border-bottom:1px solid var(--line2);padding:4px 6px;text-align:left}
+.dr-table td{border-bottom:1px solid var(--line);padding:8px 6px;vertical-align:top}
+.dr-table .dtag{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;white-space:nowrap}
+.dr-table .droom{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink2);white-space:nowrap;line-height:1.5}
+.served{display:block;font-size:9px;letter-spacing:.04em;color:var(--blue);margin-top:2px;white-space:normal;max-width:110px}
+.dr-table .dnote{font-size:10.5px;color:var(--bad);margin-top:3px;max-width:200px;white-space:normal;line-height:1.4}
+.dr-table .dnote.info{color:var(--ink3)}
+.dot{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:middle}
+.dot.d{background:var(--done)}
+.dot.h{background:conic-gradient(var(--half) 0 180deg,var(--half-soft) 180deg 360deg)}
+.dot.n{background:var(--bad-soft);border:2.5px solid var(--bad)}
+.dot.x{background:transparent;border:1.5px dashed var(--na)}
+.dot-btn{padding:3px;border:none;background:none;cursor:pointer;border-radius:50%;line-height:0}
+.dot-btn:hover{background:var(--blue-soft)}
+.dot-btn:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.dot-btn .dot{transition:transform .15s ease}
+.dot-btn:hover .dot{transform:scale(1.15)}
+.dot-btn.edited .dot{box-shadow:0 0 0 2px var(--blue)}
+.dot-btn.static{cursor:default;opacity:.45}
+.dot-btn.static:hover{background:none}
+.dot-btn.static:hover .dot{transform:none}
+.dr-hint{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.05em;color:var(--ink2);background:var(--blue-soft);border:1px solid var(--line);border-radius:3px;padding:7px 10px;margin-bottom:14px}
+.dr-table .lvlcell{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink2)}
+
+@media (max-width:980px){
+  .kpis{grid-template-columns:minmax(0,1fr);gap:20px}
+  .kpi-meters{min-width:0}
+  .kpi-side{border-left:none;padding-left:0;border-top:1px solid var(--line);padding-top:14px;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:10px 18px}
+  .ks{min-width:0}
+  .toolbar{position:static}
+}
+@media (max-width:640px){
+  .mast-inner{padding:18px}
+  .tb{display:block;width:100%;overflow-x:auto;margin-left:0}
+  .kpi-meters{grid-template-columns:minmax(0,1fr);gap:10px}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .dr-meters{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="mast-id">
+      <div class="eyebrow">MISK CITY · RIYADH</div>
+      <h1>Mishraq Project MEP <span>Portal</span></h1>
+    </div>
+    <nav class="tb" aria-label="Disciplines">
+      <table>
+        <tbody>
+          <tr class="tb-row" data-disc="electrical" tabindex="0" role="button" aria-label="Electrical page"><td class="td-disc">ELECTRICAL</td><td>9 SB · 15 SWR · 21 LV</td><td class="td-prog" id="tbProg-electrical"><span class="ptxt">—</span></td></tr>
+          <tr class="tb-row" data-disc="mechanical" tabindex="0" role="button" aria-label="Mechanical page"><td class="td-disc">MECHANICAL</td><td>3 ETS · 9 AHU · 12 PR</td><td class="td-prog" id="tbProg-mechanical"><span class="ptxt">—</span></td></tr>
+          <tr class="tb-row" data-disc="ict" tabindex="0" role="button" aria-label="ICT page"><td class="td-disc">ICT</td><td>1 GSM · 1 FCC · 12 TLC</td><td class="td-prog" id="tbProg-ict"><span class="ptxt">—</span></td></tr>
+        </tbody>
+      </table>
+    </nav>
+  </div>
+  <div class="hazard" aria-hidden="true"></div>
+</header>
+
+<div class="frame">
+<main class="sheet" id="view-electrical">
+  <section class="kpis" aria-label="Overall progress">
+    <div class="kpi-dial">
+      <div class="dial-wrap">
+        <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true">
+          <circle class="dial-track" cx="66" cy="66" r="56"/>
+          <circle class="dial-fill" id="dialFill" cx="66" cy="66" r="56" stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
+        </svg>
+        <div class="dial-num" id="dialNum">–</div>
+      </div>
+      <div class="kpi-dial-label">OVERALL PROGRESS</div>
+    </div>
+    <div class="kpi-meters" id="meters"></div>
+    <div class="kpi-side" id="sideStats"></div>
+  </section>
+
+  <section class="toolbar" aria-label="Filters">
+    <input id="q" class="q" type="search" placeholder="Search equipment, room or room no. — e.g. TR-3A, 98-552, MDB" aria-label="Search">
+    <div class="seg" id="segLevel" role="group" aria-label="Level filter"></div>
+    <div class="chips" id="chips" role="group" aria-label="Status filters"></div>
+    <select id="sort" aria-label="Sort order">
+      <option value="attn">Sort · attention first</option>
+      <option value="prog">Sort · progress high→low</option>
+      <option value="sheet">Sort · sheet order</option>
+    </select>
+    <span class="edit-tools">
+      <span class="tbtn info" id="editInfo" hidden>EDITS <span class="n">0</span></span>
+      
+      <button class="tbtn" id="logBtn" title="سجل من عدّل ماذا">LOG</button>
+      <button class="tbtn" id="exportBtn" title="Download all current statuses as a CSV file for Excel">EXPORT CSV</button>
+      <button class="tbtn" id="resetBtn" hidden title="Restore the original values from the workbook">RESET EDITS</button>
+    </span>
+  </section>
+
+  <section class="grid" id="grid" aria-label="Substations"></section>
+
+  <section class="lookahead" aria-label="Two week lookahead">
+    <h2>2-Week Lookahead</h2>
+    <p class="la-sub">Planned activities for this week and next — derived from the current site status, then edit freely: click the circle to complete, ⇄ to move between weeks, ✕ to remove.</p>
+    <div class="la-grid">
+      <div class="la-col" id="laW1">
+        <div class="la-head"><b>This week</b><span id="laW1dates"></span><span class="cnt" id="laW1cnt"></span></div>
+        <div class="la-body" id="laW1body"></div>
+        <div class="la-add">
+          <input type="text" id="laInput1" placeholder="Add an activity for this week…" aria-label="Add activity this week">
+          <select id="laTag1" aria-label="Tag"></select>
+          <button class="tbtn" data-add="w1">ADD</button>
+        </div>
+      </div>
+      <div class="la-col" id="laW2">
+        <div class="la-head"><b>Next week</b><span id="laW2dates"></span><span class="cnt" id="laW2cnt"></span></div>
+        <div class="la-body" id="laW2body"></div>
+        <div class="la-add">
+          <input type="text" id="laInput2" placeholder="Add an activity for next week…" aria-label="Add activity next week">
+          <select id="laTag2" aria-label="Tag"></select>
+          <button class="tbtn" data-add="w2">ADD</button>
+        </div>
+      </div>
+    </div>
+    <p class="la-hint">Lookahead is stored in this browser alongside your status edits — it does not modify the source workbook.</p>
+  </section>
+
+  <div class="foot">
+    <div class="leg" aria-label="Legend">
+      <span><i class="sw" style="background:var(--done)"></i>DONE / INSTALLED</span>
+      <span><i class="sw" style="background:conic-gradient(var(--half) 0 180deg,var(--half-soft) 180deg 360deg)"></i>ONGOING / UNDER REVIEW</span>
+      <span><i class="sw" style="background:var(--bad-soft);border:2.5px solid var(--bad)"></i>NOT STARTED / BLOCKED</span>
+      <span><i class="sw" style="background:repeating-linear-gradient(-45deg,#D8DFE5 0 4px,#E9EEF2 4px 8px)"></i>NOT IN SCOPE</span>
+    </div>
+    <p class="src">Doc ref MSK-ELV-B02-001 rev A · generated 15 Oct 2026 from <span class="mono">basment plan.xlsx</span> (data as of 11 Oct 2026) — statuses normalized: Delivered / Installed / Done = complete; ongoing civil / block work &amp; “UR” = in progress; No / Not = pending. Scope: Electrical — 9 B-2 substations + CAI &amp; SEC, plus the 19 B-1 SMDB rooms under their serving substations, grouped by building in the BLDGS view. Status dots are editable (complete / not complete) and the 2-week lookahead is stored in this browser; statuses export to CSV.</p>
+  </div>
+
+</main>
+
+<main class="sheet" id="view-mechanical" hidden>
+  <section class="kpis" aria-label="Mechanical progress">
+    <div class="kpi-dial">
+      <div class="dial-wrap">
+        <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true">
+          <circle class="dial-track" cx="66" cy="66" r="56"/>
+          <circle class="dial-fill" id="dialFillMech" cx="66" cy="66" r="56" stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
+        </svg>
+        <div class="dial-num" id="dialNumMech">—</div>
+      </div>
+      <div class="kpi-dial-label">MECHANICAL PROGRESS</div>
+    </div>
+    <div class="kpi-meters" id="metersMech"></div>
+    <div class="kpi-side" id="sideStatsMech"></div>
+  </section>
+
+  <section class="toolbar" aria-label="Mechanical filters">
+    <input id="qMech" class="q" type="search" placeholder="Search equipment, room or room no." aria-label="Search mechanical">
+    <div class="seg" id="segLevelMech" role="group" aria-label="Mechanical level filter"></div>
+    <select id="sortMech" aria-label="Mechanical sort order">
+      <option value="attn">Sort · attention first</option>
+      <option value="prog">Sort · progress high→low</option>
+      <option value="sheet">Sort · sheet order</option>
+    </select>
+    <span class="edit-tools">
+      <button class="tbtn" id="exportMechBtn" title="Available once the Mechanical sheet is loaded" disabled>EXPORT CSV</button>
+    </span>
+  </section>
+
+  <section class="grid" id="gridMech" aria-label="Mechanical areas"></section>
+
+  <section class="lookahead" aria-label="Mechanical two week lookahead">
+    <h2>2-Week Lookahead</h2>
+    <p class="la-sub">Mechanical planned activities — this week and next. Click the circle to complete, ⇄ to move between weeks, ✕ to remove.</p>
+    <div class="la-grid">
+      <div class="la-col" id="laMW1">
+        <div class="la-head"><b>This week</b><span id="laMW1dates"></span><span class="cnt" id="laMW1cnt"></span></div>
+        <div class="la-body" id="laMW1body"></div>
+        <div class="la-add">
+          <input type="text" id="laMInput1" placeholder="Add a mechanical activity for this week…" aria-label="Add mechanical activity this week">
+          <button class="tbtn" data-madd="w1">ADD</button>
+        </div>
+      </div>
+      <div class="la-col" id="laMW2">
+        <div class="la-head"><b>Next week</b><span id="laMW2dates"></span><span class="cnt" id="laMW2cnt"></span></div>
+        <div class="la-body" id="laMW2body"></div>
+        <div class="la-add">
+          <input type="text" id="laMInput2" placeholder="Add a mechanical activity for next week…" aria-label="Add mechanical activity next week">
+          <button class="tbtn" data-madd="w2">ADD</button>
+        </div>
+      </div>
+    </div>
+    <p class="la-hint">Mechanical lookahead is stored in this browser. When the Mechanical sheet is loaded, its equipment cards fill the grid automatically.</p>
+  </section>
+
+  <div class="foot">
+    <div class="leg" aria-label="Legend">
+      <span><i class="sw" style="background:var(--done)"></i>DONE / INSTALLED</span>
+      <span><i class="sw" style="background:conic-gradient(var(--half) 0 180deg,var(--half-soft) 180deg 360deg)"></i>ONGOING / UNDER REVIEW</span>
+      <span><i class="sw" style="background:var(--bad-soft);border:2.5px solid var(--bad)"></i>NOT STARTED / BLOCKED</span>
+      <span><i class="sw" style="background:repeating-linear-gradient(-45deg,#D8DFE5 0 4px,#E9EEF2 4px 8px)"></i>NOT IN SCOPE</span>
+    </div>
+    <p class="src">Mechanical page — same layout and interactions as Electrical. Awaiting the Mechanical tracker (3 ETS · 9 AHU · 12 PR); the grid fills automatically once the sheet is shared.</p>
+  </div>
+</main>
+
+<main class="sheet" id="view-ict" hidden>
+  <section class="kpis" aria-label="ICT progress">
+    <div class="kpi-dial">
+      <div class="dial-wrap">
+        <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true">
+          <circle class="dial-track" cx="66" cy="66" r="56"/>
+          <circle class="dial-fill" id="dialFillIct" cx="66" cy="66" r="56" stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
+        </svg>
+        <div class="dial-num" id="dialNumIct">—</div>
+      </div>
+      <div class="kpi-dial-label">ICT PROGRESS</div>
+    </div>
+    <div class="kpi-meters" id="metersIct"></div>
+    <div class="kpi-side" id="sideStatsIct"></div>
+  </section>
+
+  <section class="toolbar" aria-label="ICT filters">
+    <input id="qIct" class="q" type="search" placeholder="Search equipment, room or room no." aria-label="Search ICT">
+    <div class="seg" id="segLevelIct" role="group" aria-label="ICT level filter"></div>
+    <select id="sortIct" aria-label="ICT sort order">
+      <option value="attn">Sort · attention first</option>
+      <option value="prog">Sort · progress high→low</option>
+      <option value="sheet">Sort · sheet order</option>
+    </select>
+    <span class="edit-tools">
+      <button class="tbtn" id="exportIctBtn" title="Available once the ICT sheet is loaded" disabled>EXPORT CSV</button>
+    </span>
+  </section>
+
+  <section class="grid" id="gridIct" aria-label="ICT areas"></section>
+
+  <section class="lookahead" aria-label="ICT two week lookahead">
+    <h2>2-Week Lookahead</h2>
+    <p class="la-sub">ICT planned activities — this week and next. Click the circle to complete, ⇄ to move between weeks, ✕ to remove.</p>
+    <div class="la-grid">
+      <div class="la-col" id="laIW1">
+        <div class="la-head"><b>This week</b><span id="laIW1dates"></span><span class="cnt" id="laIW1cnt"></span></div>
+        <div class="la-body" id="laIW1body"></div>
+        <div class="la-add">
+          <input type="text" id="laIInput1" placeholder="Add an ICT activity for this week…" aria-label="Add ICT activity this week">
+          <button class="tbtn" data-iadd="w1">ADD</button>
+        </div>
+      </div>
+      <div class="la-col" id="laIW2">
+        <div class="la-head"><b>Next week</b><span id="laIW2dates"></span><span class="cnt" id="laIW2cnt"></span></div>
+        <div class="la-body" id="laIW2body"></div>
+        <div class="la-add">
+          <input type="text" id="laIInput2" placeholder="Add an ICT activity for next week…" aria-label="Add ICT activity next week">
+          <button class="tbtn" data-iadd="w2">ADD</button>
+        </div>
+      </div>
+    </div>
+    <p class="la-hint">ICT lookahead is stored in this browser. When the ICT sheet is loaded, its equipment cards fill the grid automatically.</p>
+  </section>
+
+  <div class="foot">
+    <div class="leg" aria-label="Legend">
+      <span><i class="sw" style="background:var(--done)"></i>DONE / INSTALLED</span>
+      <span><i class="sw" style="background:conic-gradient(var(--half) 0 180deg,var(--half-soft) 180deg 360deg)"></i>ONGOING / UNDER REVIEW</span>
+      <span><i class="sw" style="background:var(--bad-soft);border:2.5px solid var(--bad)"></i>NOT STARTED / BLOCKED</span>
+      <span><i class="sw" style="background:repeating-linear-gradient(-45deg,#D8DFE5 0 4px,#E9EEF2 4px 8px)"></i>NOT IN SCOPE</span>
+    </div>
+    <p class="src">ICT page — same layout and interactions as Electrical. Awaiting the ICT tracker (1 GSM · 1 FCC · 12 Telecom); the grid fills automatically once the sheet is shared.</p>
+  </div>
+</main>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drTitle">
+  <div class="dr-head">
+    <div>
+      <span class="tag" id="drTag"></span>
+      <h2 id="drTitle"></h2>
+      <div class="dr-sheet" id="drSheet"></div>
+    </div>
+    <button class="dr-close" id="drClose" aria-label="Close details">✕</button>
+  </div>
+  <div class="dr-body" id="drBody"></div>
+</aside>
+
+<div class="umodal" id="umodal" hidden>
+  <div class="um-card">
+    <b>من أنت؟ — اختيار إجباري</b>
+    <p>اختر اسمك ليُسجّل بجانب كل تعديل تقوم به — لا يمكن المتابعة بدون اختيار اسم.</p>
+    <div class="um-choices">
+      <button class="tbtn uchoice" data-n="khalaf">khalaf</button>
+      <button class="tbtn uchoice" data-n="abdulrahman">abdulrahman</button>
+      <button class="tbtn uchoice" data-n="Anvar">Anvar</button>
+      <button class="tbtn uchoice" data-n="__other">أخرى…</button>
+    </div>
+    <div id="uPinRow" hidden>
+      <p id="uWho" class="um-who"></p>
+      <input id="uPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
+      <div class="um-acts"><button class="tbtn" id="uPinOk">دخول</button></div>
+      <div id="uErr" class="um-err" hidden>رمز خاطئ — حاول مرة ثانية</div>
+    </div>
+    <div id="uOtherRow" hidden>
+      <input id="uInput" type="text" placeholder="اكتب اسمك هنا" maxlength="40">
+      <div class="um-acts"><button class="tbtn" id="uSave">حفظ</button></div>
+    </div>
+  </div>
+</div>
+<div class="lmodal" id="lmodal" hidden>
+  <div class="um-card">
+    <b>سجل التعديلات</b>
+    <div id="logList" class="loglist"></div>
+    <div class="um-acts"><button class="tbtn" id="logRename">تغيير الاسم</button><button class="tbtn" id="logClose">إغلاق</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<noscript><p style="max-width:1460px;margin:14px auto;font-family:sans-serif">This portal needs JavaScript enabled to render the interactive tracker.</p></noscript>
+
+<script id="portal-data" type="application/json">
+[{"sheet":"B02 B1","tag":"SS-01","title":"Substation 1","equip":[{"lvl":"B-2","room":"EMDB.RM","rn":"98-536","tag":"EMDB-1","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B1","_oidx":0,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-536","tag":"ATS-1","note":"SHOP: 1- Room detail not approved | INSTALL: Installed, Civil ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":1,"_osheet":"B02 B1","_oidx":1,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-538","tag":"MDB-1","note":"SHOP: 1- Room detail not approved | INSTALL: Civil ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0.5,"_osheet":"B02 B1","_oidx":2,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-538","tag":"PFC-1","note":"SHOP: 1- Room detail not approved | INSTALL: Civil ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0.5,"_osheet":"B02 B1","_oidx":3,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-539","tag":"RMU-1","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 B1","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-539","tag":"TR-1","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 B1","_oidx":5,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-505","tag":"SMDB1-WR1A","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 1","_osheet":"B02 B1","_oidx":6,"bld":"WR01","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-510","tag":"SMDB1-WR1B","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 1","_osheet":"B02 B1","_oidx":7,"bld":"WR01","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 B1","_oidx":8,"lvl":"B-1","room":"ELEC.RM","rn":"99-505","tag":"LP1-WR1B1A","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B1","_oidx":9,"lvl":"B-1","room":"ELEC.RM","rn":"99-505","tag":"CBP1-WR1B1A","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B1","_oidx":10,"lvl":"B-1","room":"ELEC.RM","rn":"99-505","tag":"LCPD-WR1B1A","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B1","_oidx":11,"lvl":"B-1","room":"ELEC.RM","rn":"99-510","tag":"EPP1-WR1B1","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B1","_oidx":12,"lvl":"B-1","room":"ELEC.RM","rn":"99-510","tag":"ELP1-WR1B1","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B1","_oidx":13,"lvl":"B-1","room":"ELEC.RM","rn":"99-510","tag":"DB1-B1","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B1","_oidx":14,"lvl":"B-1","room":"ELEC.RM","rn":"99-510","tag":"LP1-WR1B1B","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B1","_oidx":15,"lvl":"B-1","room":"ELEC.RM","rn":"99-510","tag":"CBP1-WR1B1B","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B1","_oidx":16,"lvl":"B-1","room":"ELEC.RM","rn":"99-510","tag":"LCPD-WR1B1B","served":"Served by Substation 1","bld":"WR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"B02 B2","tag":"SS-02","title":"Substation 2","equip":[{"lvl":"B-2","room":"TR1 RM","rn":"98-552","tag":"RMU-2A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil ongoing ( Strenghtening + Trench ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B2","_oidx":0,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR1 RM","rn":"98-552","tag":"RMU-2B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil ongoing ( Strenghtening + Trench ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B2","_oidx":1,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR1 RM","rn":"98-552","tag":"RMU-2C","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil ongoing ( Strenghtening + Trench ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B2","_oidx":2,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR1 RM","rn":"98-552","tag":"TR-2A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil ongoing ( Strenghtening ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B2","_oidx":3,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR1 RM","rn":"98-552","tag":"TR-2B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil ongoing ( Strenghtening ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B2","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR1 RM","rn":"98-552","tag":"TR-2C","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil ongoing ( Strenghtening ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B2","_oidx":5,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"ELE.RM.","rn":"98-550","tag":"EMDB-2","note":"SHOP: 1- Room detail not approved | INSTALL: Civil Ongoing | INCOMER: No","m":1,"ins":0.5,"_osheet":"B02 B2","_oidx":6,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"ELE.RM.","rn":"98-550","tag":"ATS-2","note":"SHOP: 1- Room detail not approved | INSTALL: Civil Ongoing | INCOMER: No","m":1,"ins":0.5,"_osheet":"B02 B2","_oidx":7,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-551","tag":"MDB-2A","note":"SHOP: 1- Room detail not approved | INSTALL: Civil Ongoing | INCOMER: No","m":1,"ins":0.5,"_osheet":"B02 B2","_oidx":8,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-551","tag":"PFC-2A","note":"SHOP: 1- Room detail not approved | INSTALL: Civil Ongoing | INCOMER: No","m":1,"ins":0.5,"_osheet":"B02 B2","_oidx":9,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-516","tag":"SMDB2-WR2A","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 2","_osheet":"B02 B2","_oidx":10,"bld":"WR02","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-638","tag":"SMDB2-WR2B","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 2","_osheet":"B02 B2","_oidx":11,"bld":"WR02","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 B2","_oidx":12,"lvl":"B-1","room":"ELEC.RM","rn":"99-516","tag":"ELP2-WR2B1","served":"Served by Substation 2","bld":"WR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B2","_oidx":13,"lvl":"B-1","room":"ELEC.RM","rn":"99-516","tag":"EPP2-WR2B1","served":"Served by Substation 2","bld":"WR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B2","_oidx":14,"lvl":"B-1","room":"ELEC.RM","rn":"99-516","tag":"LP2-WR2B1A","served":"Served by Substation 2","bld":"WR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B2","_oidx":15,"lvl":"B-1","room":"ELEC.RM","rn":"99-516","tag":"LCPD2-WR2B1A","served":"Served by Substation 2","bld":"WR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B2","_oidx":16,"lvl":"B-1","room":"ELEC.RM","rn":"99-638","tag":"DB2-B1","served":"Served by Substation 2","bld":"WR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B2","_oidx":17,"lvl":"B-1","room":"ELEC.RM","rn":"99-638","tag":"LP2-WR2B1B","served":"Served by Substation 2","bld":"WR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B2","_oidx":18,"lvl":"B-1","room":"ELEC.RM","rn":"99-638","tag":"CBP2-WR2B1B","served":"Served by Substation 2","bld":"WR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B2","_oidx":19,"lvl":"B-1","room":"ELEC.RM","rn":"99-638","tag":"LCPD2-WR2B1B","served":"Served by Substation 2","bld":"WR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"B02 B3","tag":"SS-03","title":"Substation 3","equip":[{"lvl":"B-2","room":"TR.RM","rn":"98-577","tag":"RMU-3A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Done","m":1,"ins":1,"_osheet":"B02 B3","_oidx":0,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-577","tag":"RMU-3B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Done","m":1,"ins":1,"_osheet":"B02 B3","_oidx":1,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-577","tag":"TR-3A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Done","m":1,"ins":1,"_osheet":"B02 B3","_oidx":2,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-577","tag":"TR-3B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Done","m":1,"ins":1,"_osheet":"B02 B3","_oidx":3,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-578","tag":"MDB-3A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B3","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-578","tag":"MDB-3B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B3","_oidx":5,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-578","tag":"PFC-3A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B3","_oidx":6,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-578","tag":"PFC-3B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B3","_oidx":7,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-653","tag":"EMDB-3","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B3","_oidx":8,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-653","tag":"ATS-3","note":"SHOP: 1- Room detail not approved | INSTALL: Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":1,"_osheet":"B02 B3","_oidx":9,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-520","tag":"SMDB3-CS1A","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 3","_osheet":"B02 B3","_oidx":10,"bld":"CS01","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-523","tag":"SMDB3-CS1B","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 3","_osheet":"B02 B3","_oidx":11,"bld":"CS01","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 B3","_oidx":12,"lvl":"B-1","room":"ELEC.RM","rn":"99-520","tag":"DB3-B1A","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B3","_oidx":13,"lvl":"B-1","room":"ELEC.RM","rn":"99-520","tag":"LP3-CS1B1A","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B3","_oidx":14,"lvl":"B-1","room":"ELEC.RM","rn":"99-520","tag":"LCPD3-CS1B1A","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B3","_oidx":15,"lvl":"B-1","room":"ELEC.RM","rn":"99-523","tag":"LP3-CS1B1B","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B3","_oidx":16,"lvl":"B-1","room":"ELEC.RM","rn":"99-523","tag":"LCPD3-CS1B1B","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B3","_oidx":17,"lvl":"B-1","room":"ELEC.RM","rn":"99-523","tag":"ELP3-CS1B1","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B3","_oidx":18,"lvl":"B-1","room":"ELEC.RM","rn":"99-523","tag":"DB3-B1B","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B3","_oidx":19,"lvl":"B-1","room":"ELEC.RM","rn":"99-523","tag":"EPP3-CS1B1","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B3","_oidx":20,"lvl":"B-1","room":"ELEC.RM","rn":"99-523","tag":"CBP3-CS1B1","served":"Served by Substation 3","bld":"CS01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"B02 B4","tag":"SS-04","title":"Substation 4","equip":[{"lvl":"B-2","room":"TR.RM","rn":"98-557","tag":"RMU-4A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Done","m":1,"ins":1,"_osheet":"B02 B4","_oidx":0,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-557","tag":"TR-4A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Done","m":1,"ins":1,"_osheet":"B02 B4","_oidx":1,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-557","tag":"TR-4B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No","m":1,"ins":1,"_osheet":"B02 B4","_oidx":2,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-558","tag":"MDB-4A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy & Raised Floor ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B4","_oidx":3,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-558","tag":"MDB-4B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy & Raised Floor ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B4","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-558","tag":"PFC-4A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy & Raised Floor ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B4","_oidx":5,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-558","tag":"PFC-4B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy & Raised Floor ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B4","_oidx":6,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-579","tag":"EMDB-4","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy & Raised Floor ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B4","_oidx":7,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-579","tag":"ATS-4","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy & Raised Floor ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B4","_oidx":8,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-624","tag":"RMU-9A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy & Raised Floor ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 B4","_oidx":9,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-525","tag":"SMDB4-CS2A","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 4","_osheet":"B02 B4","_oidx":10,"bld":"CS02","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-529","tag":"SMDB4-CS2B","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 4","_osheet":"B02 B4","_oidx":11,"bld":"CS02","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 B4","_oidx":12,"lvl":"B-1","room":"ELEC.RM","rn":"99-525","tag":"DB4-B1","served":"Served by Substation 4","bld":"CS02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B4","_oidx":13,"lvl":"B-1","room":"ELEC.RM","rn":"99-525","tag":"LP4-CS2B1A","served":"Served by Substation 4","bld":"CS02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B4","_oidx":14,"lvl":"B-1","room":"ELEC.RM","rn":"99-525","tag":"LCPD4-CS2B1A","served":"Served by Substation 4","bld":"CS02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B4","_oidx":15,"lvl":"B-1","room":"ELEC.RM","rn":"99-529","tag":"LCPD4-CS2B1B","served":"Served by Substation 4","bld":"CS02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B4","_oidx":16,"lvl":"B-1","room":"ELEC.RM","rn":"99-529","tag":"ELP4-CS2B1","served":"Served by Substation 4","bld":"CS02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B4","_oidx":17,"lvl":"B-1","room":"ELEC.RM","rn":"99-529","tag":"EPP4-CS2B1","served":"Served by Substation 4","bld":"CS02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 B4","_oidx":18,"lvl":"B-1","room":"ELEC.RM","rn":"99-529","tag":"CBP4-CS2B1","served":"Served by Substation 4","bld":"CS02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"B02 A2","tag":"SS-05","title":"Substation 5","equip":[{"lvl":"B-2","room":"TR.RM","rn":"98-603","tag":"RMU-5","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 A2","_oidx":0,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-603","tag":"TR-5A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 A2","_oidx":1,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-603","tag":"TR-5B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 A2","_oidx":2,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"ESS.ELE.RM","rn":"98-600","tag":"EMDB-5","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No Installed","m":1,"ins":1,"_osheet":"B02 A2","_oidx":3,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"ESS.ELE.RM","rn":"98-600","tag":"ATS-5","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No Installed","m":1,"ins":1,"_osheet":"B02 A2","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-602","tag":"MDB-5A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Ongoing","m":1,"ins":1,"_osheet":"B02 A2","_oidx":5,"term":0.5,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-602","tag":"MDB-5B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Ongoing","m":1,"ins":1,"_osheet":"B02 A2","_oidx":6,"term":0.5,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-602","tag":"PFC-5A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No Installed","m":1,"ins":1,"_osheet":"B02 A2","_oidx":7,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-602","tag":"PFC-5B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No Installed","m":1,"ins":1,"_osheet":"B02 A2","_oidx":8,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-541","tag":"SMDB5-CS5B","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 5","_osheet":"B02 A2","_oidx":9,"bld":"CS05","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-543","tag":"LCPD5-CS5B1B","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 5","_osheet":"B02 A2","_oidx":10,"bld":"CS05","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 A2","_oidx":11,"lvl":"B-1","room":"ELEC.RM","rn":"99-541","tag":"ELP5-CS5B1","served":"Served by Substation 5","bld":"CS05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A2","_oidx":12,"lvl":"B-1","room":"ELEC.RM","rn":"99-541","tag":"EPP5-CS5B1","served":"Served by Substation 5","bld":"CS05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A2","_oidx":13,"lvl":"B-1","room":"ELEC.RM","rn":"99-541","tag":"LP5-CS5B1B","served":"Served by Substation 5","bld":"CS05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A2","_oidx":14,"lvl":"B-1","room":"ELEC.RM","rn":"99-541","tag":"CBP5-CS5B1","served":"Served by Substation 5","bld":"CS05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A2","_oidx":15,"lvl":"B-1","room":"ELEC.RM","rn":"99-543","tag":"SMDB5-CS5A","served":"Served by Substation 5","bld":"CS05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A2","_oidx":16,"lvl":"B-1","room":"ELEC.RM","rn":"99-543","tag":"LP5-CS5B1A","served":"Served by Substation 5","bld":"CS05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A2","_oidx":17,"lvl":"B-1","room":"ELEC.RM","rn":"99-543","tag":"DB5-B1A","served":"Served by Substation 5","bld":"CS05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"B02 A1","tag":"SS-06","title":"Substation 6","equip":[{"lvl":"B-2","room":"TR.RM","rn":"98-589","tag":"RMU-6A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 A1","_oidx":0,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-589","tag":"RMU-6B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 A1","_oidx":1,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-589","tag":"TR-6A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 A1","_oidx":2,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-589","tag":"TR-6B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Installed","m":1,"ins":1,"_osheet":"B02 A1","_oidx":3,"term":1,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-590","tag":"MDB-6A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No","m":1,"ins":1,"_osheet":"B02 A1","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-590","tag":"MDB-6B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Ongoing","m":1,"ins":1,"_osheet":"B02 A1","_oidx":5,"term":0.5,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-590","tag":"PFC-6A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Ongoing","m":1,"ins":1,"_osheet":"B02 A1","_oidx":6,"term":0.5,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-590","tag":"PFC-6B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Ongoing","m":1,"ins":1,"_osheet":"B02 A1","_oidx":7,"term":0.5,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"ESS.ELE.RM","rn":"98-592","tag":"EMDB-6","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: Ongoing","m":1,"ins":1,"_osheet":"B02 A1","_oidx":8,"term":0.5,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"ESS.ELE.RM","rn":"98-592","tag":"ATS-6","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No","m":1,"ins":1,"_osheet":"B02 A1","_oidx":9,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-545","tag":"SMDB6-CS6B","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 6","_osheet":"B02 A1","_oidx":10,"bld":"CS06","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-550","tag":"SMDB6-CS6A","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 6","_osheet":"B02 A1","_oidx":11,"bld":"CS06","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 A1","_oidx":12,"lvl":"B-1","room":"ELEC.RM","rn":"99-545","tag":"LCPD6-CS6B1B","served":"Served by Substation 6","bld":"CS06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A1","_oidx":13,"lvl":"B-1","room":"ELEC.RM","rn":"99-545","tag":"CBP6-CS6B1","served":"Served by Substation 6","bld":"CS06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A1","_oidx":14,"lvl":"B-1","room":"ELEC.RM","rn":"99-545","tag":"LP6-CS6B1A","served":"Served by Substation 6","bld":"CS06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A1","_oidx":15,"lvl":"B-1","room":"ELEC.RM","rn":"99-545","tag":"LP6-CS6B1B","served":"Served by Substation 6","bld":"CS06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A1","_oidx":16,"lvl":"B-1","room":"ELEC.RM","rn":"99-550","tag":"LCPD6-CS6B1A","served":"Served by Substation 6","bld":"CS06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A1","_oidx":17,"lvl":"B-1","room":"ELEC.RM","rn":"99-550","tag":"EPP6-CS6B1","served":"Served by Substation 6","bld":"CS06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A1","_oidx":18,"lvl":"B-1","room":"ELEC.RM","rn":"99-550","tag":"ELP6-CS6B1","served":"Served by Substation 6","bld":"CS06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A1","_oidx":19,"lvl":"B-1","room":"ELEC.RM","rn":"99-550","tag":"DB6-B1A","served":"Served by Substation 6","bld":"CS06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"B02 A5","tag":"SS-07","title":"Substation 7","equip":[{"lvl":"B-2","room":"TR.RM","rn":"98-656","tag":"TR-7A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":0,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-656","tag":"TR-7B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":1,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-656","tag":"TR-7C","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":2,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-656","tag":"RMU-7A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":3,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-656","tag":"RMU-7B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-657","tag":"MDB-7A","note":"SHOP: 1- Room detail not approved | INSTALL: Ongoing | INCOMER: No, defecincy impacting the routing","m":1,"ins":0.5,"_osheet":"B02 A5","_oidx":5,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-657","tag":"MDB-7B","note":"SHOP: 1- Room detail not approved | INSTALL: Ongoing | INCOMER: No, defecincy impacting the routing","m":1,"ins":0.5,"_osheet":"B02 A5","_oidx":6,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-657","tag":"PFC-7A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":7,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-657","tag":"PFC-7B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":8,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-658","tag":"EMDB-7A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":9,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-658","tag":"EMDB-7B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed","m":0,"ins":0,"_osheet":"B02 A5","_oidx":10,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-658","tag":"ATS-7A","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":11,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"EMDB.RM","rn":"98-658","tag":"ATS-7B","note":"SHOP: 1- Room detail not approved | INSTALL: Installed | INCOMER: No, defecincy impacting the routing","m":1,"ins":1,"_osheet":"B02 A5","_oidx":12,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-567","tag":"SMDB7-BR5","note":"SHOP: MV Cable rout not approved","m":0,"ins":0,"served":"Served by Substation 7","_osheet":"B02 A5","_oidx":13,"term":0,"test":0,"energ":0,"sd":0,"bld":"BR05"},{"lvl":"B-1","room":"ELEC.RM","rn":"99-574","tag":"SMDB7-BR6","note":"SHOP: MV Cable rout not approved","m":0,"ins":0,"served":"Served by Substation 7","_osheet":"B02 A5","_oidx":14,"term":0,"test":0,"energ":0,"sd":0,"bld":"BR06"},{"lvl":"B-1","room":"ELEC.RM","rn":"99-537","tag":"SMDB7-CS4","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 7","_osheet":"B02 A5","_oidx":15,"bld":"CS04","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 A5","_oidx":16,"lvl":"B-1","room":"ELEC.RM","rn":"99-567","tag":"LP7-BR5B1","served":"Served by Substation 7","bld":"BR05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":17,"lvl":"B-1","room":"ELEC.RM","rn":"99-567","tag":"CBP7-BR5B1","served":"Served by Substation 7","bld":"BR05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":18,"lvl":"B-1","room":"ELEC.RM","rn":"99-567","tag":"ELP7-BR5B1","served":"Served by Substation 7","bld":"BR05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":19,"lvl":"B-1","room":"ELEC.RM","rn":"99-567","tag":"LCPD7-BR5B1","served":"Served by Substation 7","bld":"BR05","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":20,"lvl":"B-1","room":"ELEC.RM","rn":"99-574","tag":"DB7-B1A","served":"Served by Substation 7","bld":"BR06","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":21,"lvl":"B-1","room":"ELEC.RM","rn":"99-537","tag":"LP7-CS4B1","served":"Served by Substation 7","bld":"CS04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":22,"lvl":"B-1","room":"ELEC.RM","rn":"99-537","tag":"CBP7-CS4B1","served":"Served by Substation 7","bld":"CS04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":23,"lvl":"B-1","room":"ELEC.RM","rn":"99-537","tag":"LCPD7-CS4B1","served":"Served by Substation 7","bld":"CS04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":24,"lvl":"B-1","room":"ELEC.RM","rn":"99-537","tag":"DB7-B1B","served":"Served by Substation 7","bld":"CS04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A5","_oidx":25,"lvl":"B-1","room":"ELEC.RM","rn":"99-537","tag":"ELP7-CS4B1","served":"Served by Substation 7","bld":"CS04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"B02 A3","tag":"SS-08","title":"Substation 8","equip":[{"lvl":"B-2","room":"MRMU ROOM","rn":"98-608","tag":"RMU-8","note":"SHOP: 1- Room detail not approved | INSTALL: Not installed, Block work ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A3","_oidx":0,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MRMU ROOM","rn":"98-608","tag":"MRMU-1","note":"SHOP: 1- Room detail not approved | INSTALL: Not installed, Block work ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A3","_oidx":1,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MRMU ROOM","rn":"98-608","tag":"MRMU-2","note":"SHOP: 1- Room detail not approved | INSTALL: Not installed, Block work ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A3","_oidx":2,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-609","tag":"TR-8","note":"SHOP: 1- Room detail not approved | INSTALL: Not installed, Block work ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A3","_oidx":3,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-610","tag":"MDB-8","note":"SHOP: 1- Room detail not approved | INSTALL: Not installed, Block work ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A3","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-610","tag":"PFC-8","note":"SHOP: 1- Room detail not approved | INSTALL: Not installed, Block work ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A3","_oidx":5,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"UPS RM","rn":"98-611","tag":"EMDB-8","note":"SHOP: 1- Room detail not approved | INSTALL: Not installed, Block work ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A3","_oidx":6,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"UPS RM","rn":"98-611","tag":"ATS-8","note":"SHOP: 1- Room detail not approved | INSTALL: Not installed, Block work ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A3","_oidx":7,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-555","tag":"SMDB8-BR2","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 8","_osheet":"B02 A3","_oidx":8,"bld":"BR02","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELE.RM","rn":"99-676","tag":"SMDB8-BR1","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 8","_osheet":"B02 A3","_oidx":9,"bld":"BR01","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 A3","_oidx":10,"lvl":"B-1","room":"ELEC.RM","rn":"99-555","tag":"DB8-B1","served":"Served by Substation 8","bld":"BR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A3","_oidx":11,"lvl":"B-1","room":"ELEC.RM","rn":"99-555","tag":"ELP8-BR2B1","served":"Served by Substation 8","bld":"BR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A3","_oidx":12,"lvl":"B-1","room":"ELEC.RM","rn":"99-555","tag":"CBP8-BR2B1","served":"Served by Substation 8","bld":"BR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A3","_oidx":13,"lvl":"B-1","room":"ELEC.RM","rn":"99-555","tag":"LP8-BR2B1","served":"Served by Substation 8","bld":"BR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A3","_oidx":14,"lvl":"B-1","room":"ELEC.RM","rn":"99-555","tag":"LCPD8-BR2B1","served":"Served by Substation 8","bld":"BR02","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A3","_oidx":15,"lvl":"B-1","room":"ELE.RM","rn":"99-676","tag":"LP8-BR1B1","served":"Served by Substation 8","bld":"BR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A3","_oidx":16,"lvl":"B-1","room":"ELE.RM","rn":"99-676","tag":"LCPD8-BR1B1","served":"Served by Substation 8","bld":"BR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A3","_oidx":17,"lvl":"B-1","room":"ELE.RM","rn":"99-676","tag":"EPP8-BR1B1","served":"Served by Substation 8","bld":"BR01","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"B02 A4","tag":"SS-09","title":"Substation 9","equip":[{"lvl":"B-2","room":"ELEC.RM","rn":"98-622","tag":"EMDB-9","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":0,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"ELEC.RM","rn":"98-622","tag":"ATS-9","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":1,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-623","tag":"MDB-9A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":2,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-623","tag":"MDB-9B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":3,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-623","tag":"PFC-9A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":4,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB.RM","rn":"98-623","tag":"PFC-9B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":5,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-624","tag":"RMU-9A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":6,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-624","tag":"RMU-9B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":7,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-624","tag":"TR-9A","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":8,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"TR.RM","rn":"98-624","tag":"TR-9B","note":"SHOP: 1- Room detail not approved | INSTALL: Not Installed, Civil Ongoing ( Epoxy ) | INCOMER: No","m":1,"ins":0,"_osheet":"B02 A4","_oidx":9,"term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-560","tag":"SMDB9-BR3","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 9","_osheet":"B02 A4","_oidx":10,"bld":"BR03","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-1","room":"ELEC.RM","rn":"99-563","tag":"SMDB9-BR4","note":"SHOP: MV Cable rout not approved","m":1,"ins":0,"served":"Served by Substation 9","_osheet":"B02 A4","_oidx":11,"bld":"BR04","term":0,"test":0,"energ":0,"sd":0},{"_osheet":"B02 A4","_oidx":12,"lvl":"B-1","room":"ELEC.RM","rn":"99-560","tag":"LP9-BR3B1","served":"Served by Substation 9","bld":"BR03","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A4","_oidx":13,"lvl":"B-1","room":"ELEC.RM","rn":"99-560","tag":"LCPD9-BR3B1","served":"Served by Substation 9","bld":"BR03","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A4","_oidx":14,"lvl":"B-1","room":"ELEC.RM","rn":"99-560","tag":"DB9-B1","served":"Served by Substation 9","bld":"BR03","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A4","_oidx":15,"lvl":"B-1","room":"ELEC.RM","rn":"99-563","tag":"CBP9-BR4B1","served":"Served by Substation 9","bld":"BR04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A4","_oidx":16,"lvl":"B-1","room":"ELEC.RM","rn":"99-563","tag":"LCPD9-BR4B1","served":"Served by Substation 9","bld":"BR04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A4","_oidx":17,"lvl":"B-1","room":"ELEC.RM","rn":"99-563","tag":"ELP9-BR4B1","served":"Served by Substation 9","bld":"BR04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A4","_oidx":18,"lvl":"B-1","room":"ELEC.RM","rn":"99-563","tag":"EPP9-BR4B1","served":"Served by Substation 9","bld":"BR04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null},{"_osheet":"B02 A4","_oidx":19,"lvl":"B-1","room":"ELEC.RM","rn":"99-563","tag":"LP9-BR4B1","served":"Served by Substation 9","bld":"BR04","m":0,"sd":0,"ins":0,"term":0,"test":0,"energ":0,"note":null}]},{"sheet":"CAI & SEC 2","tag":"CAI-2","title":"CAI & SEC 2","equip":[{"lvl":"B-2","room":"SEC RM1","rn":"98-984","tag":"MRMU-1","note":"SHOP: UR 11 Oct | INSTALL: Not Installed, Block work + Trench ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"CAI & SEC 2","_oidx":0,"bld":"CAI","term":0,"test":0,"energ":0,"sd":0.5},{"lvl":"B-2","room":"SEC RM1","rn":"98-984","tag":"MRMU-2","note":"SHOP: UR 11 Oct | INSTALL: Not Installed, Block work + Trench ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"CAI & SEC 2","_oidx":1,"bld":"CAI","term":0,"test":0,"energ":0,"sd":0.5},{"lvl":"B-2","room":"SEC RM2","rn":"98-983","tag":"MRMU-3","note":"SHOP: UR 11 Oct | INSTALL: Not Installed, Block work + Trench ongoing | INCOMER: No","m":1,"ins":0,"_osheet":"CAI & SEC 2","_oidx":2,"bld":"CAI","term":0,"test":0,"energ":0,"sd":0.5},{"lvl":"B-2","room":"MDB","rn":"98-219","tag":"MDB CAI1","note":"SHOP: 1- Room detail not Submitted 2- MV Cable rout not Submitted | INSTALL: Block work ongoing | INCOMER: No","m":0,"ins":0.5,"_osheet":"CAI & SEC 2","_oidx":3,"bld":"CAI","term":0,"test":0,"energ":0,"sd":0},{"lvl":"B-2","room":"MDB","rn":"98-219","tag":"MDB CAI2","note":"SHOP: 1- Room detail not Submitted 2- MV Cable rout not Submitted | INSTALL: Block work ongoing | INCOMER: No","m":0,"ins":0.5,"_osheet":"CAI & SEC 2","_oidx":4,"bld":"CAI","term":0,"test":0,"energ":0,"sd":0}]}]
+</script>
+
+<script>
+const RAW = JSON.parse(document.getElementById('portal-data').textContent);
+const DATA = RAW.map(s=>({sheet:s.sheet, tag:s.tag, title:s.title, equip:s.equip.map(e=>({...e}))}));
+const STAGE_KEYS = ['m','sd','ins','term','test','energ'];
+const EKEY = 'mishraq_edits_v1';
+let EDITS = {};
+try { EDITS = JSON.parse(localStorage.getItem(EKEY) || '{}') || {}; } catch(err) { EDITS = {}; }
+function saveEdits(){ try { localStorage.setItem(EKEY, JSON.stringify(EDITS)); } catch(err) {} saveMeta(); }
+function applyEdits(){
+  Object.entries(EDITS).forEach(([key,val])=>{
+    const [sheet, idx, stage] = key.split('|');
+    if (!STAGE_KEYS.includes(stage)) return;
+    const eq = DATA.flatMap(s=>s.equip).find(e=>e._osheet===sheet && e._oidx===+idx);
+    if (eq && stage in eq) eq[stage] = val;
+  });
+}
+
+applyEdits();
+if (Object.keys(EDITS).length) document.body.classList.add('edited');
+const STAGES = [
+  ['m','MATERIAL','M','Material delivered'],
+  ['sd','SHOP DWGS','SD','Shop drawings approved'],
+  ['ins','INSTALLATION','INS','Equipment installed'],
+  ['term','TERMINATION','TERM','Cable termination'],
+  ['test','TESTING','TST','Testing completed'],
+  ['energ','ENERGIZATION','ENR','Energized']
+];
+const CHIPS = [
+  {id:'ALL', label:'All statuses'},
+  {id:'SD',  label:'Shop dwg blocked', cls:'warn', test:e=>!!e.note&&/not approv/i.test(e.note)},
+  {id:'MAT', label:'Material pending', cls:'warn', test:e=>e.m===0},
+  {id:'SUB', label:'Dwgs not submitted', cls:'warn', test:e=>!!e.note&&/not submitted/i.test(e.note)},
+  {id:'CIV', label:'Civil works active', test:e=>!!e.note&&/civil|block work|trench/i.test(e.note)},
+  {id:'CBL', label:'Termination pending', test:e=>e.term===0},
+  {id:'DEF', label:'Routing deficiency', cls:'warn', test:e=>!!e.note&&/defecincy/i.test(e.note)}
+];
+const state = {level:'B-2', chip:'ALL', q:'', sort:'attn', open:null};
+
+const pctTxt = p => Math.round(p*100)+'%';
+function eqProgress(e){
+  const vs = STAGES.map(s=>e[s[0]]).filter(v=>v!==null);
+  return vs.reduce((a,b)=>a+b,0)/vs.length;
+}
+function stageAgg(list, key){
+  const vs = list.map(e=>e[key]).filter(v=>v!==null);
+  const done = vs.filter(v=>v===1).length, half = vs.filter(v=>v===0.5).length;
+  return {done, half, total:vs.length, pct: vs.length ? (done + .5*half)/vs.length : null};
+}
+function levelList(){
+  if (state.level==='BLDGS'){
+    const by = {};
+    DATA.forEach(s=>s.equip.forEach(e=>{ if (e.bld) (by[e.bld] = by[e.bld]||[]).push(e); }));
+    return Object.entries(by).map(([name,items])=>(
+      {sub:{sheet:'BUILDING', tag:'BLDG', title:name}, eq:items, di:'B:'+name}));
+  }
+  return DATA.map((s,di)=>({sub:s, di, eq: s.equip.filter(e=>state.level==='ALL'||e.lvl===state.level)}))
+             .filter(x=>x.eq.length);
+}
+function filteredList(){
+  const q = state.q.trim().toLowerCase();
+  const chip = CHIPS.find(c=>c.id===state.chip);
+  return levelList().map(x=>{
+    let eq = x.eq;
+    if (chip && chip.test) eq = eq.filter(chip.test);
+    if (q) eq = eq.filter(e =>
+      (e.tag||'').toLowerCase().includes(q) ||
+      (e.room||'').toLowerCase().includes(q) ||
+      (e.rn||'').toLowerCase().includes(q) ||
+      x.sub.title.toLowerCase().includes(q));
+    return {sub:x.sub, eq};
+  }).filter(x=>x.eq.length);
+}
+function blockers(list){
+  const has = t => list.some(t);
+  if (has(e=>e.m===0)) return {txt:'Material not delivered', cls:''};
+  if (has(e=>e.note&&/defecincy/i.test(e.note))) return {txt:'Routing deficiency', cls:'warn'};
+  if (has(e=>e.note&&/civil|block work|trench/i.test(e.note))) return {txt:'Civil works active', cls:'warn'};
+  if (has(e=>e.term===0||e.term===0.5)) return {txt:'Termination pending', cls:'warn'};
+  if (has(e=>e.note&&/not approv/i.test(e.note))) return {txt:'Shop dwg pending', cls:''};
+  return {txt:'No open blockers', cls:'ok'};
+}
+
+/* ── KPI strip ── */
+function renderKPI(){
+  const list = levelList().flatMap(x=>x.eq);
+  const overall = list.length ? list.reduce((a,e)=>a+eqProgress(e),0)/list.length : 0;
+  const C = 2*Math.PI*56;
+  const fill = document.getElementById('dialFill');
+  if (fill) fill.style.strokeDashoffset = C*(1-overall);
+  const dn = document.getElementById('dialNum');
+  if (dn) dn.textContent = pctTxt(overall);
+
+  document.getElementById('meters').innerHTML = STAGES.map(([k,label,,full])=>{
+    const a = stageAgg(list,k);
+    const dW = a.total? a.done/a.total*100 : 0, hW = a.total? a.half/a.total*100 : 0;
+    return `<div class="meter">
+      <div class="m-head"><span class="m-name">${label}</span>
+      <span class="m-count">${a.done}/${a.total}${a.half?` <em>+${a.half} ongoing</em>`:''}</span></div>
+      <div class="m-bar"><span class="m-done" style="width:${dW}%"></span><span class="m-half" style="width:${hW}%"></span></div>
+    </div>`;
+  }).join('');
+
+  const subs = levelList().length;
+  const rooms = new Set(list.map(e=>e.lvl+'|'+e.room+'|'+e.rn)).size;
+  const blocked = list.filter(e=>!!e.note&&/not approv/i.test(e.note)).length;
+  const side = document.getElementById('sideStats');
+  if (!side) return;
+  side.innerHTML = `
+    <div class="ks"><b>${subs}</b><span>TRACKING AREAS</span></div>
+    <div class="ks"><b>${list.length}</b><span>ITEMS</span></div>
+    <div class="ks"><b>${rooms}</b><span>ROOMS</span></div>
+    <div class="ks"><b class="alert">${blocked}</b><span>SD BLOCKED</span></div>
+    ${LAST?`<div class="ks"><b style="font-size:13px;line-height:1.25">${LAST.u}</b><span>LAST BY · ${tshort(LAST.t)}</span></div>`:''}`;
+  const pc = document.getElementById('tbProg-electrical');
+  if (pc){
+    const span = pc.querySelector('.ptxt');
+    if (span){
+      span.textContent = pctTxt(overall);
+      span.className = 'ptxt g' + (overall>=1?'100':overall>=0.75?'75':overall>=0.5?'50':overall>=0.25?'25':'0');
+    }
+  }
+}
+
+/* ── Level buttons (data-driven — levels appear only when they have rows) ── */
+function renderLevels(){
+  const lvls = [...new Set(DATA.flatMap(s=>s.equip.map(e=>e.lvl).filter(Boolean)))];
+  const hasBld = DATA.some(s=>s.equip.some(e=>e.bld));
+  const btn = (lvl,label)=>`<button data-lvl="${lvl}" class="${state.level===lvl?'active':''}">${label}</button>`;
+  document.getElementById('segLevel').innerHTML =
+    lvls.map(l=>btn(l,l)).join('') +
+    (hasBld?btn('BLDGS','BLDGS'):'');
+  if (!lvls.includes(state.level) && !(state.level==='BLDGS'&&hasBld)){
+    state.level = lvls[0] || 'B-2';
+    const cur = document.querySelector(`#segLevel button[data-lvl="${state.level}"]`);
+    if (cur) cur.classList.add('active');
+  }
+}
+
+/* ── Chips ── */
+function renderChips(){
+  const all = DATA.flatMap(s=>s.equip);
+  document.getElementById('chips').innerHTML = CHIPS.map(c=>{
+    const n = c.test ? all.filter(c.test).length : null;
+    return `<button class="chip ${c.cls||''} ${state.chip===c.id?'active':''}" data-chip="${c.id}">
+      ${c.label}${n!==null?`<i>${n}</i>`:''}</button>`;
+  }).join('');
+}
+
+/* ── Card grid ── */
+function segCell(list,[k,label,short]){
+  const a = stageAgg(list,k);
+  if (!a.total) return `<div class="seg-cell na" title="${label}: not in scope"><div class="seg-fill"></div></div>`;
+  const w = a.pct*100, cls = a.pct===0?'zero':'';
+  const col = a.pct===1?'var(--done)':(a.pct===0?'var(--bad)':'var(--half)');
+  const title = `${label}: ${pctTxt(a.pct)} — ${a.done} done${a.half?`, ${a.half} ongoing`:''} of ${a.total}`;
+  return `<div class="seg-cell ${cls}" data-stage="${k}" role="button" tabindex="0" aria-label="Toggle all ${label} for this area" title="${title} — click to toggle all"><div class="seg-fill"><span class="f" style="width:${w}%;background:${col}"></span></div></div>`;
+}
+function cardHTML(x, j){
+  const {sub, eq} = x;
+  const dIdx = DATA.indexOf(sub);
+  const prog = eq.reduce((a,e)=>a+eqProgress(e),0)/eq.length;
+  const r = 24, C = 2*Math.PI*r;
+  const allSub = eq;
+  const b = blockers(eq);
+  const segs = STAGES.map(s=>segCell(eq,s)).join('');
+  const labels = STAGES.map(s=>`<span>${s[2]}</span>`).join('');
+  const rn = [...new Set(allSub.map(e=>e.rn).filter(Boolean))];
+  return `<button class="card" data-i="${dIdx}" style="animation-delay:${j*35}ms" aria-haspopup="dialog">
+    <div class="card-top">
+      <span class="tag">${state.level==='BLDGS'?`${sub.title} · BUILDING`:`${sub.tag} · ${sub.sheet}`}</span>
+      <span class="lvls">${[...new Set(allSub.map(e=>e.lvl))].map(l=>`<i>${l}</i>`).join('')}</span>
+    </div>
+    <div class="card-mid">
+      <div>
+        <h3>${state.level==='B-1' ? 'Served by '+sub.title : sub.title}</h3>
+        <div class="sub">${rn.length} room${rn.length>1?'s':''} · ${rn.slice(0,3).join(' · ')}${rn.length>3?' …':''}</div>
+      </div>
+      <div class="mini-dial">
+        <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+          <circle class="mini-track" cx="32" cy="32" r="${r}"/>
+          <circle class="mini-fill" cx="32" cy="32" r="${r}" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C*(1-prog)).toFixed(2)}"/>
+        </svg>
+        <div class="mini-num">${Math.round(prog*100)}%</div>
+      </div>
+    </div>
+    <div class="bus">${segs}</div>
+    <div class="bus-labels">${labels}</div>
+    <div class="card-foot">
+      <span class="eqc"><b>${eq.length}</b> of ${allSub.length} items</span>
+      <span class="foot-note ${b.cls}">${b.txt}</span>
+    </div>
+  </button>`;
+}
+function renderGrid(){
+  const fl = filteredList();
+  let order = fl.map((x,i)=>({x,i}));
+  const prog = x => x.eq.reduce((a,e)=>a+eqProgress(e),0)/x.eq.length;
+  const blkN = x => x.eq.filter(e=>e.sd===0||e.m===0).length;
+  if (state.sort==='attn') order.sort((a,b)=>blkN(b.x)-blkN(a.x)||prog(a.x)-prog(b.x));
+  if (state.sort==='prog') order.sort((a,b)=>prog(b.x)-prog(a.x));
+  if (state.sort==='sheet') order.sort((a,b)=>a.i-b.i);
+  document.getElementById('grid').innerHTML = order.length
+    ? order.map((o,j)=>cardHTML(o.x, j)).join('')
+    : `<div class="empty"><b>No substations match the current filters</b>
+       Try clearing the search or picking a different status chip.</div>`;
+  document.querySelectorAll('#grid .card').forEach((c,j)=>{
+    c.addEventListener('click',()=>openDrawer(order[j].x));
+    const grp = order[j].x;
+    c.querySelectorAll('.seg-cell[data-stage]').forEach(cell=>{
+      cell.addEventListener('click',ev=>{
+        ev.stopPropagation();
+        if (cell.classList.contains('na')) return;
+        const stage = cell.dataset.stage;
+        const items = grp.eq.filter(e=>e[stage]!==null);
+        if (!items.length) return;
+        const target = items.some(e=>e[stage]!==1) ? 1 : 0;
+        let n = 0;
+        items.forEach(e=>{
+          const key = `${e._osheet||grp.sub.sheet}|${e._oidx!==undefined?e._oidx:(grp.sub.equip||grp.eq).indexOf(e)}|${stage}`;
+          if (e[stage]!==target){ e[stage]=target; EDITS[key]=target; EINFO[key]={u:USER(), t:Date.now()}; n++; }
+        });
+        if (!n) return;
+        saveEdits(); refreshAfterEdit();
+        toast(`${grp.sub.title} · ${STAGES.find(s=>s[0]===stage)[1]} → ${target===1?'Complete':'Not complete'} (${n} items)`);
+        logAct({act:'bulk', g:grp.sub.title, s:STAGES.find(s=>s[0]===stage)[1], n, v:target});
+      });
+      cell.addEventListener('keydown',ev=>{
+        if (ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); ev.stopPropagation(); cell.click(); }
+      });
+    });
+  });
+}
+
+/* ── 2-Week Lookahead ── */
+const LAKEY = 'mishraq_lookahead_v1';
+let LOOKAHEAD = null;
+try { const raw = localStorage.getItem(LAKEY); LOOKAHEAD = raw ? JSON.parse(raw) : null; } catch(err) { LOOKAHEAD = null; }
+if (!Array.isArray(LOOKAHEAD)) LOOKAHEAD = null;
+function laId(){ return 'la' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function laSave(){ try { localStorage.setItem(LAKEY, JSON.stringify(LOOKAHEAD)); } catch(err) {} }
+function laSeed(){
+  const items = [];
+  const push = (week, tag, text) => items.push({id: laId(), week, tag, text, done:false});
+  push('w1','ALL','Follow up room detail + MV cable route approvals — shop drawings blocked on all substations');
+  const civil = DATA.filter(s=>s.equip.some(e=>e.note&&/civil|block work|trench/i.test(e.note))).map(s=>s.tag);
+  if (civil.length) push('w1','CIV','Complete ongoing civil works (epoxy / strengthening / trench / block work) — '+civil.join(', '));
+  const mat = [];
+  DATA.forEach(s=>s.equip.forEach(e=>{ if(e.m===0) mat.push(e.tag+' ('+s.tag+')'); }));
+  if (mat.length) push('w1','MAT','Deliver pending material — '+mat.join(', '));
+  const cab = [];
+  DATA.forEach(s=>s.equip.forEach(e=>{ if(e.term===0.5) cab.push(e.tag+' ('+s.tag+')'); }));
+  if (cab.length) push('w1','CBL','Complete ongoing cabling — '+cab.join(', '));
+  const rib = DATA.filter(s=>s.equip.some(e=>e.ins===0 && e.note && /civil|block work|trench/i.test(e.note))).map(s=>s.tag);
+  if (rib.length) push('w2','INS','Install equipment once civil clears — '+rib.join(', '));
+  const cabStart = DATA.filter(s=>s.equip.some(e=>e.ins===1&&e.term===0)).map(s=>s.tag);
+  if (cabStart.length) push('w2','CBL','Start cabling at installed substations — '+cabStart.join(', '));
+  return items;
+}
+if (!LOOKAHEAD){ LOOKAHEAD = laSeed(); laSave(); }
+const MNTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function laWeekRange(offset){
+  const now = new Date();
+  const start = new Date(now); start.setDate(now.getDate() - now.getDay() + offset*7);
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  return `${MNTHS[start.getMonth()]} ${start.getDate()} – ${MNTHS[end.getMonth()]} ${end.getDate()}`;
+}
+function laItemHTML(it){
+  return `<div class="la-item${it.done?' done':''}" data-id="${it.id}">
+    <button class="la-check" data-act="toggle" title="Mark complete / open" aria-label="Mark activity complete"></button>
+    <div class="la-mid">
+      <div class="la-txt">${it.text}</div>
+      <div class="la-meta"><i>${it.tag}</i></div>
+    </div>
+    <div class="la-acts">
+      <button class="la-btn" data-act="move" title="Move to the other week">⇄</button>
+      <button class="la-btn" data-act="del" title="Remove activity">✕</button>
+    </div>
+  </div>`;
+}
+function renderLookahead(){
+  if (!document.getElementById('laW1body')) return;
+  document.getElementById('laW1dates').textContent = laWeekRange(0);
+  document.getElementById('laW2dates').textContent = laWeekRange(1);
+  const tags = ['ALL', ...new Set(DATA.map(s=>s.tag))];
+  [1,2].forEach(n=>{
+    document.getElementById('laTag'+n).innerHTML = tags.map(t=>`<option value="${t}">${t}</option>`).join('');
+  });
+  const w1 = LOOKAHEAD.filter(i=>i.week==='w1');
+  const w2 = LOOKAHEAD.filter(i=>i.week==='w2');
+  document.getElementById('laW1body').innerHTML = w1.length ? w1.map(laItemHTML).join('') : `<div class="la-empty">No activities yet — add one below.</div>`;
+  document.getElementById('laW2body').innerHTML = w2.length ? w2.map(laItemHTML).join('') : `<div class="la-empty">No activities yet — add one below.</div>`;
+  document.getElementById('laW1cnt').textContent = w1.length ? w1.filter(i=>!i.done).length+' open' : '';
+  document.getElementById('laW2cnt').textContent = w2.length ? w2.filter(i=>!i.done).length+' open' : '';
+}
+document.querySelectorAll('.la-add .tbtn').forEach(b=>b.addEventListener('click',()=>{
+  const wk = b.dataset.add;
+  const inp = document.getElementById('laInput'+(wk==='w1'?'1':'2'));
+  const tag = document.getElementById('laTag'+(wk==='w1'?'1':'2')).value;
+  const text = inp.value.trim();
+  if (!text) return;
+  LOOKAHEAD.push({id: laId(), week: wk, tag, text, done:false});
+  inp.value = '';
+  laSave(); renderLookahead();
+  logAct({act:'la+', txt:text.slice(0,60)});
+}));
+[['laW1body'],['laW2body']].forEach(([bodyId])=>{
+  document.getElementById(bodyId).addEventListener('click',e=>{
+    const item = e.target.closest('.la-item'); if (!item) return;
+    const it = LOOKAHEAD.find(i=>i.id===item.dataset.id);
+    if (!it) return;
+    const btn = e.target.closest('.la-btn');
+    if (btn){
+      if (btn.dataset.act==='move') it.week = it.week==='w1'?'w2':'w1';
+      if (btn.dataset.act==='del') LOOKAHEAD = LOOKAHEAD.filter(i=>i.id!==it.id);
+    } else if (e.target.closest('.la-check')){
+      it.done = !it.done;
+    } else return;
+    laSave(); renderLookahead();
+  });
+});
+
+/* ── Drawer ── */
+function openDrawer(x){
+  if (!x || !x.eq || !x.eq.length) return;
+  state.open = x;
+  const sub = x.sub, eq = x.eq;
+  document.getElementById('drTag').textContent = state.level==='BLDGS'?`${sub.title} · BUILDING`:`${sub.tag} · ${sub.sheet}`;
+  document.getElementById('drTitle').textContent = sub.title;
+  document.getElementById('drSheet').textContent = `${eq.length} items tracked at level ${state.level}`;
+  const meters = STAGES.map(([k,label])=>{
+    const a = stageAgg(eq,k);
+    const dW = a.total? a.done/a.total*100 : 0, hW = a.total? a.half/a.total*100 : 0;
+    if (!a.total) return `<div class="meter"><div class="m-head"><span class="m-name">${label}</span><span class="m-count">n/a</span></div><div class="m-bar" style="opacity:.35"></div></div>`;
+    return `<div class="meter"><div class="m-head"><span class="m-name">${label}</span><span class="m-count">${a.done}/${a.total}${a.half?` <em>+${a.half}</em>`:''}</span></div><div class="m-bar"><span class="m-done" style="width:${dW}%"></span><span class="m-half" style="width:${hW}%"></span></div></div>`;
+  }).join('');
+  const rows = eq.map(e=>{
+    const gi = (sub.equip||eq).indexOf(e);
+    const note = e.note ? `<div class="dnote${/installed$|installed,/i.test(e.note)&&!/not|no /i.test(e.note)?' info':''}">${e.note}</div>` : '';
+    const cells = STAGES.map(([k,label,short])=>{
+      const v = e[k];
+      const cls = v===1?'d':v===0.5?'h':v===0?'n':'x';
+      const edited = EDITS[`${e._osheet||sub.sheet}|${e._oidx!==undefined?e._oidx:gi}|${k}`] !== undefined;
+      const curTxt = v===1?'Complete':v===0.5?'Ongoing / under review':v===0?'Not complete':'Not tracked in source';
+      const mk = `${e._osheet||sub.sheet}|${e._oidx!==undefined?e._oidx:gi}|${k}`;
+      const mi = EINFO[mk];
+      const lab = `${e.tag} — ${label}: ${curTxt}${mi?` — بواسطة ${mi.u} · ${tshort(mi.t)}`:''}`;
+      return `<td><button class="dot-btn${v===null?' static':''}${edited?' edited':''}" data-sheet="${e._osheet||sub.sheet}" data-idx="${e._oidx!==undefined?e._oidx:gi}" data-stage="${k}" data-label="${e.tag} · ${short}" title="${lab}${v===null?'':' — click to toggle'}" aria-label="${lab}${v===null?'':'. Click to toggle'}"><span class="dot ${cls}"></span></button></td>`;
+    }).join('');
+    return `<tr>
+      <td class="lvlcell">${e.lvl||''}</td>
+      <td class="droom">${e.room||''}<br>${e.rn||''}${e.served?`<span class="served">${e.served}</span>`:''}</td>
+      <td class="dtag">${e.tag}${note}</td>
+      ${cells}
+    </tr>`;
+  }).join('');
+  document.getElementById('drBody').innerHTML =
+    `<div class="dr-hint">UPDATE: click a status dot to toggle it complete / not complete — every total above updates live.</div>
+     <div class="dr-meters">${meters}</div>
+     <table class="dr-table">
+       <thead><tr><th>LVL</th><th>ROOM</th><th>EQUIPMENT</th>${STAGES.map(s=>`<th title="${s[3]}">${s[2]}</th>`).join('')}</tr></thead>
+       <tbody>${rows}</tbody>
+     </table>`;
+  document.getElementById('drawer').classList.add('show');
+  document.getElementById('backdrop').classList.add('show');
+  document.getElementById('drClose').focus();
+}
+
+function closeDrawer(){
+  state.open = null;
+  document.getElementById('drawer').classList.remove('show');
+  document.getElementById('backdrop').classList.remove('show');
+}
+
+/* ── Editable status dots ── */
+let toastT;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function updateEditUI(){
+  const n = Object.keys(EDITS).length;
+  const info = document.getElementById('editInfo');
+  const rst = document.getElementById('resetBtn');
+  info.hidden = n===0; rst.hidden = n===0;
+  info.querySelector('.n').textContent = n;
+}
+function refreshAfterEdit(){
+  document.body.classList.add('edited');
+  const drBody = document.getElementById('drBody');
+  const st = drBody.scrollTop;
+  if (state.open) openDrawer(state.open);
+  drBody.scrollTop = st;
+  renderAll(); updateEditUI();
+}
+function resetEdits(){
+  RAW.forEach((s,si)=>{
+    const target = DATA[si];
+    s.equip.forEach((e,ei)=>{
+      const t = target.equip[ei];
+      STAGE_KEYS.forEach(k=>{
+        if (k in e) t[k] = e[k];
+      });
+    });
+  });
+}
+function exportCSV(){
+  const head = ['Substation','Sheet','Level','Building','Room','Room No.','Equipment','Material','Installation','Termination','Testing','Energization','Notes'];
+  const map = v => v===1?'Complete':v===0.5?'Ongoing':v===0?'Not complete':'';
+  const lines = [head.join(',')];
+  DATA.forEach(s=>s.equip.forEach(e=>{
+    const row = [s.title,s.sheet,e.lvl,e.bld||'',e.room,e.rn,e.tag,map(e.m),map(e.ins),map(e.term),map(e.test),map(e.energ),(e.note||'')];
+    lines.push(row.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','));
+  }));
+  const blob = new Blob(['\ufeff'+lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mishraq-basement-status.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Statuses exported to CSV');
+}
+document.getElementById('drBody').addEventListener('click', e=>{
+  const b = e.target.closest('.dot-btn');
+  if (!b || b.classList.contains('static')) return;
+  const {sheet, idx, stage, label} = b.dataset;
+  const eq = DATA.flatMap(s=>s.equip).find(e=>e._osheet===sheet && e._oidx===+idx);
+  if (!eq || !STAGE_KEYS.includes(stage)) return;
+  const next = eq[stage]===1 ? 0 : 1;
+  eq[stage] = next;
+  const ekey = `${sheet}|${idx}|${stage}`;
+  EDITS[ekey] = next;
+  EINFO[ekey] = {u:USER(), t:Date.now()};
+  logAct({act:'dot', k:ekey, s:stage, v:next});
+  saveEdits();
+  refreshAfterEdit();
+  toast(`${label} → ${next===1?'Complete':'Not complete'}`);
+});
+
+/* ── Wiring ── */
+function setChip(id){
+  state.chip = id;
+  renderChips(); renderGrid();
+}
+document.getElementById('chips').addEventListener('click',e=>{
+  const b = e.target.closest('.chip'); if (b) setChip(b.dataset.chip);
+});
+document.getElementById('segLevel').addEventListener('click',e=>{
+  const b = e.target.closest('button'); if (!b) return;
+  state.level = b.dataset.lvl;
+  document.querySelectorAll('#segLevel button').forEach(x=>x.classList.toggle('active',x===b));
+  renderAll();
+});
+document.getElementById('q').addEventListener('input',e=>{
+  state.q = e.target.value; renderGrid();
+});
+document.getElementById('sort').addEventListener('change',e=>{
+  state.sort = e.target.value; renderGrid();
+});
+document.getElementById('drClose').addEventListener('click',closeDrawer);
+document.getElementById('backdrop').addEventListener('click',closeDrawer);
+document.addEventListener('keydown',e=>{ if (e.key==='Escape') closeDrawer(); });
+
+document.getElementById('exportBtn').addEventListener('click', exportCSV);
+document.getElementById('resetBtn').addEventListener('click', function(){
+  const b = this;
+  if (b.dataset.arm !== '1'){
+    b.dataset.arm = '1'; b.textContent = 'CONFIRM RESET?';
+    setTimeout(()=>{ b.dataset.arm=''; b.textContent='RESET EDITS'; }, 3000);
+    return;
+  }
+  b.dataset.arm=''; b.textContent='RESET EDITS';
+  EDITS = {}; EINFO = {}; saveEdits(); resetEdits(); logAct({act:'reset'});
+  document.body.classList.remove('edited');
+  renderAll(); updateEditUI();
+  if (state.open) openDrawer(state.open);
+  toast('All edits reset to workbook values');
+});
+function renderAll(){ renderLevels(); renderKPI(); renderChips(); renderGrid(); renderLookahead(); }
+
+/* ── Mechanical page (same layout, awaiting data) ── */
+const MECH_DATA = [];
+const MKEY = 'mishraq_lookahead_mech_v1';
+let MLOOK = null;
+try { const raw = localStorage.getItem(MKEY); MLOOK = raw ? JSON.parse(raw) : null; } catch(err) { MLOOK = null; }
+if (!Array.isArray(MLOOK)) MLOOK = [];
+function mSave(){ try { localStorage.setItem(MKEY, JSON.stringify(MLOOK)); } catch(err) {} }
+function mWeekRange(offset){
+  const now = new Date();
+  const start = new Date(now); start.setDate(now.getDate() - now.getDay() + offset*7);
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  return `${MNTHS[start.getMonth()]} ${start.getDate()} – ${MNTHS[end.getMonth()]} ${end.getDate()}`;
+}
+function mItemHTML(it){
+  return `<div class="la-item${it.done?' done':''}" data-id="${it.id}">
+    <button class="la-check" data-act="toggle" title="Mark complete / open" aria-label="Mark activity complete"></button>
+    <div class="la-mid"><div class="la-txt">${it.text}</div></div>
+    <div class="la-acts">
+      <button class="la-btn" data-act="move" title="Move to the other week">⇄</button>
+      <button class="la-btn" data-act="del" title="Remove activity">✕</button>
+    </div>
+  </div>`;
+}
+function renderMech(){
+  const list = MECH_DATA.flatMap(s=>s.equip||[]);
+  // KPI dial
+  const overall = list.length ? list.reduce((a,e)=>a+eqProgress(e),0)/list.length : 0;
+  const fill = document.getElementById('dialFillMech');
+  fill.style.strokeDashoffset = 351.86*(1-overall);
+  document.getElementById('dialNumMech').textContent = list.length ? pctTxt(overall) : '—';
+  // meters (six stages, zeros until data)
+  document.getElementById('metersMech').innerHTML = STAGES.map(([k,label])=>{
+    const a = stageAgg(list,k);
+    const dW = a.total? a.done/a.total*100 : 0, hW = a.total? a.half/a.total*100 : 0;
+    if (!a.total) return `<div class="meter"><div class="m-head"><span class="m-name">${label}</span><span class="m-count">0/0</span></div><div class="m-bar" style="opacity:.35"></div></div>`;
+    return `<div class="meter"><div class="m-head"><span class="m-name">${label}</span><span class="m-count">${a.done}/${a.total}${a.half?` <em>+${a.half}</em>`:''}</span></div><div class="m-bar"><span class="m-done" style="width:${dW}%"></span><span class="m-half" style="width:${hW}%"></span></div></div>`;
+  }).join('');
+  // side stats
+  const areas = new Set(list.map(e=>e._g)).size || MECH_DATA.length;
+  const rooms = new Set(list.map(e=>e.lvl+'|'+e.room+'|'+e.rn)).size;
+  document.getElementById('sideStatsMech').innerHTML = `
+    <div class="ks"><b>${areas}</b><span>TRACKING AREAS</span></div>
+    <div class="ks"><b>${list.length}</b><span>ITEMS</span></div>
+    <div class="ks"><b>${rooms}</b><span>ROOMS</span></div>
+    <div class="ks"><b>${list.filter(e=>e.sd===0).length}</b><span>SD BLOCKED</span></div>`;
+  // level buttons (same three, zeros until data)
+  const btn = (lvl,label)=>`<button data-lvl="${lvl}" class="${mstate.level===lvl?'active':''}">${label}</button>`;
+  document.getElementById('segLevelMech').innerHTML = btn('B-2','B-2')+btn('B-1','B-1')+btn('BLDGS','BLDGS');
+  // grid
+  const groups = (function(){
+    if (!list.length) return [];
+    if (mstate.level==='BLDGS'){
+      const by = {};
+      MECH_DATA.forEach(s=>(s.equip||[]).forEach(e=>{ if (e.bld) (by[e.bld]=by[e.bld]||[]).push(e); }));
+      return Object.entries(by).map(([name,items])=>({sub:{sheet:'BUILDING',tag:'BLDG',title:name}, eq:items}));
+    }
+    return MECH_DATA.map(s=>({sub:s, eq:(s.equip||[]).filter(e=>mstate.level==='B-2'||e.lvl===mstate.level)})).filter(x=>x.eq.length);
+  })();
+  document.getElementById('gridMech').innerHTML = groups.length
+    ? groups.map((x,j)=>cardHTML(x, j)).join('')
+    : `<div class="empty-mech"><b>Awaiting Mechanical data</b><span>3 ETS ROOMS · 9 AHU · 12 PUMP ROOMS — THE SHEET LOADS HERE AUTOMATICALLY</span></div>`;
+  document.querySelectorAll('#gridMech .card').forEach((c,j)=>{
+    c.addEventListener('click', ()=>{ /* rows become clickable once data exists */ });
+  });
+  // lookahead
+  document.getElementById('laMW1dates').textContent = mWeekRange(0);
+  document.getElementById('laMW2dates').textContent = mWeekRange(1);
+  const w1 = MLOOK.filter(i=>i.week==='w1'), w2 = MLOOK.filter(i=>i.week==='w2');
+  document.getElementById('laMW1body').innerHTML = w1.length ? w1.map(mItemHTML).join('') : `<div class="la-empty">No mechanical activities yet — add one below.</div>`;
+  document.getElementById('laMW2body').innerHTML = w2.length ? w2.map(mItemHTML).join('') : `<div class="la-empty">No mechanical activities yet — add one below.</div>`;
+  document.getElementById('laMW1cnt').textContent = w1.length ? w1.filter(i=>!i.done).length+' open' : '';
+  document.getElementById('laMW2cnt').textContent = w2.length ? w2.filter(i=>!i.done).length+' open' : '';
+  document.getElementById('exportMechBtn').disabled = !list.length;
+  // header progress cell
+  const pc = document.getElementById('tbProg-mechanical');
+  if (pc){
+    const span = pc.querySelector('.ptxt');
+    span.textContent = list.length ? pctTxt(overall) : '—';
+    span.className = 'ptxt' + (list.length ? ' g'+(overall>=1?'100':overall>=0.75?'75':overall>=0.5?'50':overall>=0.25?'25':'0') : ' na');
+  }
+}
+const mstate = {level:'B-2'};
+document.getElementById('segLevelMech').addEventListener('click',e=>{
+  const b = e.target.closest('button'); if (!b) return;
+  mstate.level = b.dataset.lvl; renderMech();
+});
+document.querySelectorAll('[data-madd]').forEach(b=>b.addEventListener('click',()=>{
+  const wk = b.dataset.madd;
+  const inp = document.getElementById('laMInput'+(wk==='w1'?'1':'2'));
+  const text = inp.value.trim();
+  if (!text) return;
+  MLOOK.push({id: laId(), week: wk, text, done:false});
+  inp.value = '';
+  mSave(); renderMech();
+  logAct({act:'la+', disc:'MECH', txt:text.slice(0,60)});
+}));
+[['laMW1body'],['laMW2body']].forEach(([id])=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    const item = e.target.closest('.la-item'); if (!item) return;
+    const it = MLOOK.find(i=>i.id===item.dataset.id); if (!it) return;
+    const btn = e.target.closest('.la-btn');
+    if (btn){
+      if (btn.dataset.act==='move') it.week = it.week==='w1'?'w2':'w1';
+      if (btn.dataset.act==='del') MLOOK = MLOOK.filter(i=>i.id!==it.id);
+    } else if (e.target.closest('.la-check')) it.done = !it.done;
+    else return;
+    mSave(); renderMech();
+  });
+});
+document.getElementById('exportMechBtn').addEventListener('click',()=>{
+  if (!MECH_DATA.length) return;
+  toast('Mechanical export available once the sheet is loaded');
+});
+
+/* ── ICT page (same layout, awaiting data) ── */
+const ICT_DATA = [];
+const IKEY = 'mishraq_lookahead_ict_v1';
+let ILOOK = null;
+try { const raw = localStorage.getItem(IKEY); ILOOK = raw ? JSON.parse(raw) : null; } catch(err) { ILOOK = null; }
+if (!Array.isArray(ILOOK)) ILOOK = [];
+function iSave(){ try { localStorage.setItem(IKEY, JSON.stringify(ILOOK)); } catch(err) {} }
+function iItemHTML(it){
+  return `<div class="la-item${it.done?' done':''}" data-id="${it.id}">
+    <button class="la-check" data-act="toggle" title="Mark complete / open" aria-label="Mark activity complete"></button>
+    <div class="la-mid"><div class="la-txt">${it.text}</div></div>
+    <div class="la-acts">
+      <button class="la-btn" data-act="move" title="Move to the other week">⇄</button>
+      <button class="la-btn" data-act="del" title="Remove activity">✕</button>
+    </div>
+  </div>`;
+}
+function renderIct(){
+  const list = ICT_DATA.flatMap(s=>s.equip||[]);
+  const overall = list.length ? list.reduce((a,e)=>a+eqProgress(e),0)/list.length : 0;
+  document.getElementById('dialFillIct').style.strokeDashoffset = 351.86*(1-overall);
+  document.getElementById('dialNumIct').textContent = list.length ? pctTxt(overall) : '—';
+  document.getElementById('metersIct').innerHTML = STAGES.map(([k,label])=>{
+    const a = stageAgg(list,k);
+    const dW = a.total? a.done/a.total*100 : 0, hW = a.total? a.half/a.total*100 : 0;
+    if (!a.total) return `<div class="meter"><div class="m-head"><span class="m-name">${label}</span><span class="m-count">0/0</span></div><div class="m-bar" style="opacity:.35"></div></div>`;
+    return `<div class="meter"><div class="m-head"><span class="m-name">${label}</span><span class="m-count">${a.done}/${a.total}${a.half?` <em>+${a.half}</em>`:''}</span></div><div class="m-bar"><span class="m-done" style="width:${dW}%"></span><span class="m-half" style="width:${hW}%"></span></div></div>`;
+  }).join('');
+  const areas = new Set(list.map(e=>e._g)).size || ICT_DATA.length;
+  const rooms = new Set(list.map(e=>e.lvl+'|'+e.room+'|'+e.rn)).size;
+  document.getElementById('sideStatsIct').innerHTML = `
+    <div class="ks"><b>${areas}</b><span>TRACKING AREAS</span></div>
+    <div class="ks"><b>${list.length}</b><span>ITEMS</span></div>
+    <div class="ks"><b>${rooms}</b><span>ROOMS</span></div>
+    <div class="ks"><b>${list.filter(e=>e.sd===0).length}</b><span>SD BLOCKED</span></div>`;
+  const btn = (lvl,label)=>`<button data-lvl="${lvl}" class="${istate.level===lvl?'active':''}">${label}</button>`;
+  document.getElementById('segLevelIct').innerHTML = btn('B-2','B-2')+btn('B-1','B-1')+btn('BLDGS','BLDGS');
+  let groups = [];
+  if (list.length){
+    if (istate.level==='BLDGS'){
+      const by = {};
+      ICT_DATA.forEach(s=>(s.equip||[]).forEach(e=>{ if (e.bld) (by[e.bld]=by[e.bld]||[]).push(e); }));
+      groups = Object.entries(by).map(([name,items])=>({sub:{sheet:'BUILDING',tag:'BLDG',title:name}, eq:items}));
+    } else {
+      groups = ICT_DATA.map(s=>({sub:s, eq:(s.equip||[]).filter(e=>istate.level==='B-2'||e.lvl===istate.level)})).filter(x=>x.eq.length);
+    }
+  }
+  document.getElementById('gridIct').innerHTML = groups.length
+    ? groups.map((x,j)=>cardHTML(x, j)).join('')
+    : `<div class="empty-mech"><b>Awaiting ICT data</b><span>1 GSM ROOM · 1 FCC · 12 TELECOM — THE SHEET LOADS HERE AUTOMATICALLY</span></div>`;
+  document.querySelectorAll('#gridIct .card').forEach(c=>c.addEventListener('click',()=>{}));
+  document.getElementById('laIW1dates').textContent = mWeekRange(0);
+  document.getElementById('laIW2dates').textContent = mWeekRange(1);
+  const w1 = ILOOK.filter(i=>i.week==='w1'), w2 = ILOOK.filter(i=>i.week==='w2');
+  document.getElementById('laIW1body').innerHTML = w1.length ? w1.map(iItemHTML).join('') : `<div class="la-empty">No ICT activities yet — add one below.</div>`;
+  document.getElementById('laIW2body').innerHTML = w2.length ? w2.map(iItemHTML).join('') : `<div class="la-empty">No ICT activities yet — add one below.</div>`;
+  document.getElementById('laIW1cnt').textContent = w1.length ? w1.filter(i=>!i.done).length+' open' : '';
+  document.getElementById('laIW2cnt').textContent = w2.length ? w2.filter(i=>!i.done).length+' open' : '';
+  document.getElementById('exportIctBtn').disabled = !list.length;
+  const pc = document.getElementById('tbProg-ict');
+  if (pc){
+    const span = pc.querySelector('.ptxt');
+    span.textContent = list.length ? pctTxt(overall) : '—';
+    span.className = 'ptxt' + (list.length ? ' g'+(overall>=1?'100':overall>=0.75?'75':overall>=0.5?'50':overall>=0.25?'25':'0') : ' na');
+  }
+}
+const istate = {level:'B-2'};
+document.getElementById('segLevelIct').addEventListener('click',e=>{
+  const b = e.target.closest('button'); if (!b) return;
+  istate.level = b.dataset.lvl; renderIct();
+});
+document.querySelectorAll('[data-iadd]').forEach(b=>b.addEventListener('click',()=>{
+  const wk = b.dataset.iadd;
+  const inp = document.getElementById('laIInput'+(wk==='w1'?'1':'2'));
+  const text = inp.value.trim();
+  if (!text) return;
+  ILOOK.push({id: laId(), week: wk, text, done:false});
+  inp.value = '';
+  iSave(); renderIct();
+  logAct({act:'la+', disc:'ICT', txt:text.slice(0,60)});
+}));
+[['laIW1body'],['laIW2body']].forEach(([id])=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    const item = e.target.closest('.la-item'); if (!item) return;
+    const it = ILOOK.find(i=>i.id===item.dataset.id); if (!it) return;
+    const btn = e.target.closest('.la-btn');
+    if (btn){
+      if (btn.dataset.act==='move') it.week = it.week==='w1'?'w2':'w1';
+      if (btn.dataset.act==='del') ILOOK = ILOOK.filter(i=>i.id!==it.id);
+    } else if (e.target.closest('.la-check')) it.done = !it.done;
+    else return;
+    iSave(); renderIct();
+  });
+});
+document.getElementById('exportIctBtn').addEventListener('click',()=>{
+  if (!ICT_DATA.length) return;
+  toast('ICT export available once the sheet is loaded');
+});
+
+/* ── Multi-user sync (active only when opened from the live portal server) ── */
+let SYNC_ON = false, SYNC_T = 0;
+const TG_TOKEN='3856204377d2b3521d1310d1d02759d3001d713bb66bb25ebc46731e8395';
+const TG_PATH='mishraq-state-10-19';
+const TG_READ='https://api.telegra.ph/getPage/'+TG_PATH+'?return_content=true';
+function tgParse(j){ const pre=((j.result||{}).content||[]).find(n=>n.tag==='pre'); return pre?JSON.parse(pre.children[0]):null; }
+async function tgWrite(payload){
+  const fd=new URLSearchParams();
+  fd.set('access_token',TG_TOKEN); fd.set('title','mishraq-state');
+  fd.set('content',JSON.stringify([{tag:'pre',children:[JSON.stringify(payload)]}]));
+  fd.set('return_content','false');
+  const j=await (await fetch('https://api.telegra.ph/editPage/'+TG_PATH,{method:'POST',body:fd})).json();
+  if(!j.ok) throw new Error('tg-write');
+}
+async function tgRead(){
+  const j=await (await fetch(TG_READ+'&t='+Date.now(),{cache:'no-store'})).json();
+  if(!j.ok) throw new Error('tg-read');
+  return tgParse(j);
+}
+function syncPayload(){ return {edits: EDITS, meta: EINFO, log: LOG, la: LOOKAHEAD, mla: MLOOK, ila: ILOOK, updated: Date.now()}; }
+function syncApply(remote){
+  Object.keys(EDITS).forEach(k=>delete EDITS[k]);
+  Object.entries(remote.edits||{}).forEach(([k,v])=>EDITS[k]=v);
+  applyEdits();
+  if (Array.isArray(remote.la)) LOOKAHEAD = remote.la;
+  if (Array.isArray(remote.mla)) MLOOK = remote.mla;
+  if (Array.isArray(remote.ila)) ILOOK = remote.ila;
+  if (remote.meta) EINFO = remote.meta;
+  if (Array.isArray(remote.log)) LOG = remote.log;
+  LAST = LOG.length ? {u:LOG[LOG.length-1].u, t:LOG[LOG.length-1].t} : null;
+  saveMeta();
+  renderAll(); renderMech(); renderIct(); updateEditUI();
+}
+async function syncSave(){
+  if (!SYNC_ON) return;
+  try {
+    TG_TOKEN ? await tgWrite(syncPayload()) : await fetch('/edits.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(syncPayload())});
+    SYNC_T = syncPayload().updated;
+  } catch(err){}
+}
+async function syncPoll(){
+  try {
+    const r = TG_TOKEN ? { json: async()=>await tgRead() } : await fetch('/edits.json',{cache:'no-store'});
+    if (r.ok){
+      const remote = await r.json();
+      if ((remote.updated||0) !== SYNC_T){ SYNC_T = remote.updated||0; syncApply(remote); }
+    }
+  } catch(err){}
+}
+(async function initSync(){
+  try {
+    const r = TG_TOKEN ? { json: async()=>await tgRead() } : await fetch('/edits.json',{cache:'no-store'});
+    if (!r.ok) return;
+    SYNC_ON = true;
+    const remote = await r.json();
+    SYNC_T = remote.updated||0;
+    const haveLocal = Object.keys(EDITS).length || LOOKAHEAD.length || MLOOK.length || ILOOK.length;
+    if (remote.updated){ syncApply(remote); }
+    else if (haveLocal){ syncSave(); }
+    const _se = saveEdits, _la = laSave, _m = mSave, _i = iSave;
+    saveEdits = function(){ _se(); syncSave(); };
+    laSave = function(){ _la(); syncSave(); };
+    mSave = function(){ _m(); syncSave(); };
+    iSave = function(){ _i(); syncSave(); };
+    setInterval(syncPoll, 25000);
+  } catch(err){ /* opened as a file or static hosting → local-only mode */ }
+})();
+
+/* ── Users & activity log ── */
+const UKEY='mishraq_user', MKEY2='mishraq_meta_v1';
+let EINFO={}, LOG=[], LAST=null;
+try{ const m=JSON.parse(localStorage.getItem(MKEY2)||'{}'); if(m.meta)EINFO=m.meta; if(Array.isArray(m.log))LOG=m.log; LAST=m.last||null; }catch(err){}
+function saveMeta(){ try{ localStorage.setItem(MKEY2, JSON.stringify({meta:EINFO, log:LOG, last:LAST})); }catch(err){} }
+function USER(){ return localStorage.getItem(UKEY) || 'زائر'; }
+function tshort(t){ const x=new Date(t); const hm=`${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')}`; const n=new Date(); return x.toDateString()===n.toDateString()? hm : `${x.getDate()}/${x.getMonth()+1} ${hm}`; }
+function logAct(e){ e.u=USER(); e.t=Date.now(); LOG.push(e); if(LOG.length>300) LOG=LOG.slice(-300); LAST={u:e.u,t:e.t}; saveMeta(); try{ renderKPI(); }catch(err){} }
+function findByKey(k){ const [sh,ix]=k.split('|'); return DATA.flatMap(s=>s.equip).find(e=>(e._osheet||sh)===sh && String(e._oidx)===String(ix)); }
+function entryText(e){
+  if (e.act==='dot'){ const it=findByKey(e.k); const s=STAGES.find(s=>s[0]===e.s); return `${it?it.tag:e.k} · ${s?s[1]:e.s} → ${e.v===1?'Complete':'Not complete'}`; }
+  if (e.act==='bulk') return `${e.g} · ${e.s} → ${e.v===1?'Complete':'Not complete'} (${e.n} items)`;
+  if (e.act==='la+') return `Lookahead + ${e.disc?`(${e.disc}) `:''}: ${e.txt}`;
+  if (e.act==='reset') return 'Reset to workbook values';
+  return e.act;
+}
+function renderLog(){
+  document.getElementById('logList').innerHTML = LOG.length
+    ? LOG.slice().reverse().map(e=>`<div class="logrow"><span class="lt">${tshort(e.t)}</span><span class="lu">${e.u}</span><span class="lx">${entryText(e)}</span></div>`).join('')
+    : '<div class="logrow"><span class="lx">لا تعديلات بعد — اضغط أي نقطة لتبدأ التوثيق</span></div>';
+}
+function openUserModal(){
+  document.getElementById('lmodal').hidden = true;
+  resetChooser();
+  document.getElementById('umodal').hidden = false;
+}
+const PINS={khalaf:'1687',abdulrahman:'5327',Anvar:'4098'};
+let pendingName=null;
+function resetChooser(){
+  pendingName=null;
+  document.querySelector('.um-choices').hidden=false;
+  document.getElementById('uPinRow').hidden=true;
+  document.getElementById('uOtherRow').hidden=true;
+  document.getElementById('uErr').hidden=true;
+}
+document.querySelectorAll('.uchoice').forEach(b=>b.addEventListener('click',()=>{
+  const n=b.dataset.n;
+  if(n==='__other'){ resetChooser(); document.getElementById('uOtherRow').hidden=false; document.getElementById('uInput').focus(); }
+  else { resetChooser(); pendingName=n; document.querySelector('.um-choices').hidden=true; document.getElementById('uPinRow').hidden=false; document.getElementById('uWho').textContent=n; const p=document.getElementById('uPin'); p.value=''; p.focus(); }
+}));
+function confirmPin(){
+  if(!pendingName) return;
+  const p=document.getElementById('uPin');
+  if(p.value===PINS[pendingName]){
+    localStorage.setItem(UKEY,pendingName);
+    document.getElementById('umodal').hidden=true;
+    resetChooser();
+    toast('أهلًا '+localStorage.getItem(UKEY)+' 👋');
+  } else {
+    document.getElementById('uErr').hidden=false;
+    p.value=''; p.focus();
+  }
+}
+document.getElementById('uPinOk').addEventListener('click',confirmPin);
+document.getElementById('uPin').addEventListener('keydown',e=>{ if(e.key==='Enter') confirmPin(); });
+document.getElementById('uSave').addEventListener('click', ()=>{
+  const v = document.getElementById('uInput').value.trim();
+  if (!v) return;
+  localStorage.setItem(UKEY, v);
+  document.getElementById('umodal').hidden = true;
+  toast('أهلًا '+v+' 👋');
+});
+document.getElementById('lmodal').addEventListener('click', e=>{ if (e.target.id==='lmodal') document.getElementById('lmodal').hidden = true; });
+document.addEventListener('click', function(e){
+  if (localStorage.getItem(UKEY)) return;
+  const um = document.getElementById('umodal');
+  if (um.contains(e.target)) return;
+  e.stopPropagation(); e.preventDefault();
+  if (um.hidden) openUserModal();
+}, true);
+document.getElementById('uInput').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('uSave').click(); });
+document.getElementById('logBtn').addEventListener('click', ()=>{ document.getElementById('umodal').hidden = true; renderLog(); document.getElementById('lmodal').hidden = false; });
+document.getElementById('editInfo').addEventListener('click', ()=>{ document.getElementById('umodal').hidden = true; renderLog(); document.getElementById('lmodal').hidden = false; });
+document.getElementById('logClose').addEventListener('click', ()=>{ document.getElementById('lmodal').hidden = true; });
+document.getElementById('logRename').addEventListener('click', openUserModal);
+(function initUser(){
+  if (!localStorage.getItem(UKEY)) openUserModal();
+})();
+
+/* ── Discipline pages ── */
+const DISCS = ['electrical','mechanical','ict'];
+let DISC = 'electrical';
+function setDisc(d){
+  DISC = d;
+  document.querySelectorAll('.tb-row').forEach(r=>r.classList.toggle('active', r.dataset.disc===d));
+  DISCS.forEach(k=>{
+    const v = document.getElementById('view-'+k);
+    if (v) v.hidden = k!==d;
+  });
+  if (d==='mechanical') renderMech();
+  if (d==='ict') renderIct();
+  if (location.hash !== '#/'+d) history.replaceState(null,'','#/'+d);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.tb-row, [data-disc-goto]').forEach(el=>{
+  const d = el.dataset.disc || el.dataset.discGoto;
+  el.addEventListener('click', ()=>setDisc(d));
+  el.addEventListener('keydown', e=>{ if (e.key==='Enter'||e.key===' '){ e.preventDefault(); setDisc(d); } });
+});
+const initDisc = (location.hash.match(/^#\/(electrical|mechanical|ict)$/)||[])[1] || 'electrical';
+setDisc(initDisc);
+renderAll();
+updateEditUI();
+
+</script>
+</body>
+</html>
